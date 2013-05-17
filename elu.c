@@ -10,6 +10,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#define TRUE 1
+#define FALSE 0
 #define RECEIVE_BUFFER_SIZE 1024
 
 int establish_connection (const char* host_string, uint16_t port) {
@@ -93,7 +95,7 @@ int main (int argc, char** argv) {
 	int bytes_received;
 	char bytes_in[RECEIVE_BUFFER_SIZE];
 
-	while (1) {
+	while (TRUE) {
 		bytes_received = recv(sock, bytes_in, RECEIVE_BUFFER_SIZE - 1, 0);
 		bytes_in[bytes_received] = '\0';
 		printf("%s", bytes_in);
