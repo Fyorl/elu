@@ -6,13 +6,11 @@
 #include "file_utils.h"
 #include "string_utils.h"
 
-void (*file_split_callback)(const char*);
-
 /*
  * Simply reads a file in chunks of bytes and sends each chunk to a given
  * function to deal with.
  */
-void read_file (const char* filename, void (*chunk_handler)(const char*, int, int)) {
+void read_file (const char* filename, read_file_cb chunk_handler, void* cb_data) {
 	FILE* file = fopen(filename, "r");
 
 	if (file == NULL) {
@@ -25,7 +23,7 @@ void read_file (const char* filename, void (*chunk_handler)(const char*, int, in
 
 	while (!feof(file)) {
 		bytes_read = fread(buffer, sizeof(char), FILE_READ_CHUNK_SIZE, file);
-		chunk_handler(buffer, bytes_read, feof(file));
+		chunk_handler(buffer, bytes_read, feof(file), cb_data);
 	}
 
 	fclose(file);
@@ -38,7 +36,7 @@ void read_file (const char* filename, void (*chunk_handler)(const char*, int, in
  * and store it for later to be placed onto the front of the next chunk. We
  * use string_split_cb so that each line can be passed to a callback.
  */
-void file_split_lines (const char* chunk, int len, int eof) {
+void file_split_lines (const char* chunk, int len, int eof, void* line_handler) {
 	static char buffer[FILE_MAX_LINE_LEN];
 	static int n = 0;
 
@@ -80,17 +78,14 @@ void file_split_lines (const char* chunk, int len, int eof) {
 		n = 0;
 	}
 
-	string_split_cb(file_split_callback, data, '\n');
+	string_split_cb((strsplit_cb) line_handler, NULL, data, '\n');
 	free(data);
 }
 
 /*
  * We use read_file to read in a file one chunk at a time and send each chunk
- * to file_split_lines. Because file_split_lines is only allowed to accept a
- * chunk of data and its length, it has no way of knowing which callback to
- * call on
+ * to file_split_lines.
  */
-void file_get_lines (const char* filename, void (*line_handler)(const char*)) {
-	file_split_callback = line_handler;
-	read_file(filename, &file_split_lines);
+void file_get_lines (const char* filename, strsplit_cb line_handler) {
+	read_file(filename, &file_split_lines, (void*) line_handler);
 }
