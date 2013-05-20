@@ -6,28 +6,25 @@
 
 /*
  * When adding an element to a vector, the element to be added must first be a
- * pointer but also cast to void*. Since we are now just dealing with void
- * pointers, the user must provide the size (in bytes) of each element in
- * the vector so that we can properly increment the pointer the appropriate
- * number of bytes.
+ * pointer but also cast to void*.
  */
-void vector_add (vector_t* vector, const void* element, size_t element_size) {
+void vector_add (vector_t* vector, const void* element) {
 	// Cast to a char pointer because pointer arithmetic on void pointers is
 	// technically illegal.
 	char* mem_address = (char*) vector->data;
 
 	// Increment the address by a number of bytes equal to the next index in
 	// the array multiplied by the number of bytes of the type.
-	mem_address += vector->length * element_size;
+	mem_address += vector->length * vector->element_size;
 
 	// Copy the new element to that address.
-	memmove(mem_address, element, element_size);
+	memmove(mem_address, element, vector->element_size);
 	vector->length++;
 
 	if (vector->length >= vector->capacity) {
 		// If we're running out of space in our array, resize it.
 		vector->capacity *= 2;
-		void* alloc = realloc(vector->data, vector->capacity * element_size);
+		void* alloc = realloc(vector->data, vector->capacity * vector->element_size);
 
 		if (alloc == NULL) {
 			fprintf(stderr, VECTOR_ERR_ALLOC);
@@ -43,6 +40,7 @@ void vector_add (vector_t* vector, const void* element, size_t element_size) {
  */
 void vector_init (vector_t* vector, size_t element_size) {
 	vector->data = (void*) calloc(VECTOR_INITIAL_SIZE, element_size);
+	vector->element_size = element_size;
 	vector->capacity = VECTOR_INITIAL_SIZE;
 	vector->length = 0;
 

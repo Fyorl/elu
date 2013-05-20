@@ -7,7 +7,7 @@
 vector_t* strsplit_vector_ptr;
 
 void strsplit_construct_vector (const char* string) {
-	vector_charptr_add(strsplit_vector_ptr, string);
+	vector_add(strsplit_vector_ptr, (void*) &string);
 }
 
 /*
