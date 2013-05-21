@@ -28,6 +28,8 @@ void vector_add (vector_t* vector, const void* element) {
 
 		if (alloc == NULL) {
 			fprintf(stderr, VECTOR_ERR_ALLOC);
+		} else {
+			vector->data = alloc;
 		}
 	}
 }
@@ -39,7 +41,7 @@ void vector_add (vector_t* vector, const void* element) {
  * of the type of element they want to store in the vector.
  */
 void vector_init (vector_t* vector, size_t element_size) {
-	vector->data = (void*) calloc(VECTOR_INITIAL_SIZE, element_size);
+	vector->data = calloc(VECTOR_INITIAL_SIZE, element_size);
 	vector->element_size = element_size;
 	vector->capacity = VECTOR_INITIAL_SIZE;
 	vector->length = 0;

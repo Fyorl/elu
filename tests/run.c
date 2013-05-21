@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include "minunit.h"
 
+#include "test_vector.c"
 #include "test_string_utils.c"
 
 int tests_run = 0;
 
 static char* all_tests () {
+	mu_run_test(test_vector);
 	mu_run_test(test_string_utils);
 	return 0;
 }

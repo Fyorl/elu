@@ -25,7 +25,12 @@ static char* test_string_split_cb () {
 	return 0;
 }
 
+static char* test_string_split () {
+	return 0;
+}
+
 static char* test_string_utils () {
 	mu_run_test(test_string_split_cb);
+	mu_run_test(test_string_split);
 	return 0;
 }

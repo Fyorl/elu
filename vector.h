@@ -4,6 +4,8 @@
 #define VECTOR_INITIAL_SIZE 10
 #define VECTOR_ERR_ALLOC "Unable to (re)allocate memory for vector."
 
+#define vector_get(vector, index, type) ((type*)(vector.data))[index]
+
 typedef struct vector_t {
 	int capacity;
 	int length;
