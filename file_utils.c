@@ -87,5 +87,5 @@ void file_split_lines (const char* chunk, int len, int eof, void* line_handler) 
  * to file_split_lines.
  */
 void file_get_lines (const char* filename, strsplit_cb line_handler) {
-	read_file(filename, &file_split_lines, (void*) line_handler);
+	read_file(filename, &file_split_lines, line_handler);
 }

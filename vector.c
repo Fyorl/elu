@@ -11,7 +11,7 @@
 void vector_add (vector_t* vector, const void* element) {
 	// Cast to a char pointer because pointer arithmetic on void pointers is
 	// technically illegal.
-	char* mem_address = (char*) vector->data;
+	char* mem_address = vector->data;
 
 	// Increment the address by a number of bytes equal to the next index in
 	// the array multiplied by the number of bytes of the type.
@@ -53,4 +53,21 @@ void vector_init (vector_t* vector, size_t element_size) {
 
 void vector_free (vector_t* vector) {
 	free(vector->data);
+}
+
+/*
+ * This is a convenience function that treats the vector as the general 'owner'
+ * of its data and so when we free it, we also free the data associated with
+ * it. This only makes sense in the context of storing an array of pointers.
+ */
+void vector_free_deep (vector_t* vector) {
+	// Doesn't matter what pointer type we use here as long as it is not void.
+	char** data = vector->data;
+
+	int i;
+	for (i = 0; i < vector->length; i++) {
+		free(data[i]);
+	}
+
+	vector_free(vector);
 }

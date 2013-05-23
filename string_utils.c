@@ -5,7 +5,11 @@
 #include "vector.h"
 
 void strsplit_construct_vector (const char* string, void* vector) {
-	vector_add((vector_t*) vector, (void*) &string);
+	size_t size = strlen(string) + 1;
+	char* alloc = calloc(size, sizeof(char));
+	strncpy(alloc, string, size);
+
+	vector_add((vector_t*) vector, &alloc);
 }
 
 /*
@@ -25,12 +29,15 @@ void string_split_cb (strsplit_cb callback, void* cb_data, const char* string, c
 			// If we found the delimiter character or it is the end of the
 			// string then we take whatever's in the buffer and make it a
 			// string before sending it to the callback.
-			buffer[n] = '\0';
-			callback(buffer, cb_data);
 
-			// Reset the buffer ready for the next chunk of string.
-			n = 0;
-			memset(buffer, 0, STRSPLIT_MAX_ELEM_LEN * sizeof(char));
+			if (n > 0) {
+				buffer[n] = '\0';
+				callback(buffer, cb_data);
+
+				// Reset the buffer ready for the next chunk of string.
+				n = 0;
+				memset(buffer, 0, STRSPLIT_MAX_ELEM_LEN * sizeof(char));
+			}
 		} else {
 			// If we don't find the delimiter character, just add the current
 			// character to the buffer.
@@ -52,5 +59,5 @@ void string_split_cb (strsplit_cb callback, void* cb_data, const char* string, c
  * string_split_cb with a specific callback.
  */
 void string_split (vector_t* vector, const char* string, char delimiter) {
-	string_split_cb(&strsplit_construct_vector, (void*) vector, string, delimiter);
+	string_split_cb(&strsplit_construct_vector, vector, string, delimiter);
 }
