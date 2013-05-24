@@ -2,12 +2,13 @@
 #define __CONFIG_H
 
 #include <stdint.h>
+#include "vector.h"
 
 typedef struct config_t {
 	char* host;
 	char* nick;
 	char* pass;
-	char** channels;
+	vector_t channels;
 	uint16_t port;
 } config_t;
 

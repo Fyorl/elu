@@ -4,6 +4,7 @@
 #include "test_vector.c"
 #include "test_string_utils.c"
 #include "test_file_utils.c"
+#include "test_config.c"
 
 int tests_run = 0;
 
@@ -11,6 +12,7 @@ static char* all_tests () {
 	mu_run_test(test_vector);
 	mu_run_test(test_string_utils);
 	mu_run_test(test_file_utils);
+	mu_run_test(test_config);
 	return 0;
 }
 
