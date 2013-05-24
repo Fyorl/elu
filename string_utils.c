@@ -9,7 +9,6 @@ void strsplit_construct_vector (const char* string, void* vector) {
 	size_t size = strlen(string) + 1;
 	char* alloc = calloc(size, sizeof(char));
 	strncpy(alloc, string, size);
-
 	vector_add((vector_t*) vector, &alloc);
 }
 
