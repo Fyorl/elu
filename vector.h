@@ -1,6 +1,8 @@
 #ifndef __VECTOR_H
 #define __VECTOR_H
 
+#include <stdlib.h>
+
 #define VECTOR_INITIAL_SIZE 10
 #define VECTOR_ERR_ALLOC "Unable to (re)allocate memory for vector."
 

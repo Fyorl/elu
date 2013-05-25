@@ -5,6 +5,7 @@
 #include "test_string_utils.c"
 #include "test_file_utils.c"
 #include "test_config.c"
+#include "test_queue.c"
 
 int tests_run = 0;
 
@@ -13,6 +14,7 @@ static char* all_tests () {
 	mu_run_test(test_string_utils);
 	mu_run_test(test_file_utils);
 	mu_run_test(test_config);
+	mu_run_test(test_queue);
 	return 0;
 }
 

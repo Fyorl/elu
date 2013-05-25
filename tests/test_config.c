@@ -11,6 +11,12 @@ static char* test_read_config () {
 	mu_assert("config.port != 6667", config.port == 6667);
 	mu_assert("config.channels[0] != '#impsvillage'", strcmp("#impsvillage", vector_get(config.channels, 0, char*)) == 0);
 
+	// Free up stuff to make valgrind happy
+	free(config.host);
+	free(config.nick);
+	free(config.pass);
+	vector_free_deep(&(config.channels));
+
 	return 0;
 }
 

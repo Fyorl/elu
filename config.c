@@ -43,7 +43,7 @@ void parse_lines (const char* line, void* data) {
 			string_split(&(global_config->channels), value, ',');
 		}
 	} else {
-		// If we can ust store it as a string then allocate some permanent
+		// If we can just store it as a string then allocate some permanent
 		// memory and do just that.
 		*field = calloc(strlen(value) + 1, sizeof(char));
 		strcpy(*field, value);

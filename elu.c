@@ -1,4 +1,3 @@
-#include <pthread.h>
 #include <netinet/in.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -8,6 +7,7 @@
 
 #include "connection.h"
 #include "config.h"
+#include "threadpool.h"
 
 #define CONFIG_FILE "bot.conf"
 
