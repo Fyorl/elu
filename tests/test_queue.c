@@ -3,7 +3,7 @@
 
 static char* test_queue_init () {
 	queue_t queue;
-	queue_init(&queue, sizeof(int));
+	queue_init(&queue, sizeof(int), 0);
 
 	mu_assert("queue vector not initialised", queue.vector.capacity == 10);
 	mu_assert("garbage != 0", queue.garbage == 0);
@@ -15,7 +15,7 @@ static char* test_queue_init () {
 
 static char* test_queue_add () {
 	queue_t queue;
-	queue_init(&queue, sizeof(int));
+	queue_init(&queue, sizeof(int), 0);
 
 	int element = 13;
 	queue_add(&queue, &element);
@@ -23,7 +23,7 @@ static char* test_queue_add () {
 	mu_assert("13 not added to queue correctly", vector_get(queue.vector, 0, int) == 13);
 
 	queue_free(&queue);
-	queue_init(&queue, sizeof(char*));
+	queue_init(&queue, sizeof(char*), 0);
 
 	char* str = "queue string";
 	queue_add(&queue, &str);
@@ -37,7 +37,7 @@ static char* test_queue_add () {
 
 static char* test_queue_dequeue () {
 	queue_t queue;
-	queue_init(&queue, sizeof(char*));
+	queue_init(&queue, sizeof(char*), 0);
 
 	char* str1 = "str1";
 	char* str2 = "str2";
@@ -56,7 +56,7 @@ static char* test_queue_dequeue () {
 
 static char* test_queue_flush () {
 	queue_t queue;
-	queue_init(&queue, sizeof(int));
+	queue_init(&queue, sizeof(int), 0);
 
 	int i;
 	for (i = 0; i < 80; i++) {
@@ -79,10 +79,27 @@ static char* test_queue_flush () {
 	return 0;
 }
 
+static char* test_queue_ptrs () {
+	queue_t queue;
+	queue_init(&queue, sizeof(char*), 1);
+
+	char* alloc = calloc(4, sizeof(char));
+	strcpy(alloc, "abc");
+	queue_add(&queue, &alloc);
+
+	char* dq = queue_dequeue(&queue);
+	mu_assert("pointers not equal", dq == alloc);
+
+	queue_free(&queue);
+
+	return 0;
+}
+
 static char* test_queue () {
 	mu_run_test(test_queue_init);
 	mu_run_test(test_queue_add);
 	mu_run_test(test_queue_dequeue);
 	mu_run_test(test_queue_flush);
+	mu_run_test(test_queue_ptrs);
 	return 0;
 }

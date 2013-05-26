@@ -10,12 +10,12 @@
 
 typedef struct queue_t {
 	vector_t vector;
+	int ptrs;
 	int garbage;
 } queue_t;
 
-void queue_init (queue_t* queue, size_t element_size);
+void queue_init (queue_t* queue, size_t element_size, int ptrs);
 void queue_free (queue_t* queue);
-void queue_free_deep (queue_t* queue);
 void queue_add (queue_t* queue, const void* element);
 void* queue_dequeue (queue_t*);
 

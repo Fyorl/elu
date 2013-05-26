@@ -9,17 +9,24 @@
  * queues as linked lists but array-backed queues are faster.
  */
 
-void queue_init (queue_t* queue, size_t element_size) {
+void queue_init (queue_t* queue, size_t element_size, int ptrs) {
 	vector_init(&(queue->vector), element_size);
+
+	// We need to distinguish between queues that contain basic data elements
+	// which can simply be overwritten when flushing the queue, or pointers
+	// to elements. If we are managing pointers then we want to return those
+	// pointers when we dequeue instead of allocating more memory so that the
+	// caller can deal with freeing it.
+	queue->ptrs = ptrs;
 	queue->garbage = 0;
 }
 
 void queue_free (queue_t* queue) {
-	vector_free(&(queue->vector));
-}
-
-void queue_free_deep (queue_t* queue) {
-	vector_free_deep(&(queue->vector));
+	if (queue->ptrs) {
+		vector_free_deep(&(queue->vector));
+	} else {
+		vector_free(&(queue->vector));
+	}
 }
 
 void queue_add (queue_t* queue, const void* element) {
@@ -56,8 +63,14 @@ void* queue_dequeue (queue_t* queue) {
 
 	size_t element_size = queue->vector.element_size;
 	char* head = ((char*) queue->vector.data) + queue->garbage * element_size;
-	void* alloc = malloc(element_size);
-	memmove(alloc, head, element_size);
+
+	void* alloc;
+	if (queue->ptrs) {
+		alloc = *((char**) head);
+	} else {
+		alloc = malloc(element_size);
+		memmove(alloc, head, element_size);
+	}
 
 	queue->garbage++;
 
