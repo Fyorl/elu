@@ -95,11 +95,34 @@ static char* test_queue_ptrs () {
 	return 0;
 }
 
+static char* test_queue_empty () {
+	queue_t queue;
+	queue_init(&queue, sizeof(int), 0);
+
+	void* element = queue_dequeue(&queue);
+	mu_assert("initialised queue not empty", element == NULL);
+
+	int integer = 5;
+	queue_add(&queue, &integer);
+
+	element = queue_dequeue(&queue);
+	mu_assert("dequeue empty", element != NULL);
+	free(element);
+
+	element = queue_dequeue(&queue);
+	mu_assert("dequeued queue not empty", element == NULL);
+
+	queue_free(&queue);
+
+	return 0;
+}
+
 static char* test_queue () {
 	mu_run_test(test_queue_init);
 	mu_run_test(test_queue_add);
 	mu_run_test(test_queue_dequeue);
 	mu_run_test(test_queue_flush);
 	mu_run_test(test_queue_ptrs);
+	mu_run_test(test_queue_empty);
 	return 0;
 }

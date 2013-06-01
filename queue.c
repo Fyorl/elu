@@ -49,6 +49,10 @@ void flush (queue_t* queue) {
 }
 
 void* queue_dequeue (queue_t* queue) {
+	if (queue->garbage >= queue->vector.length) {
+		return NULL;
+	}
+
 	/*
 	 * To dequeue, we first allocate some memory for the element and then copy
 	 * it from the vector's data block. Then we increment the data pointer by
