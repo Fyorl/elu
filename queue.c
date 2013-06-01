@@ -21,18 +21,6 @@ void queue_init (queue_t* queue, size_t element_size, int ptrs) {
 	queue->garbage = 0;
 }
 
-void queue_free (queue_t* queue) {
-	if (queue->ptrs) {
-		vector_free_deep(&(queue->vector));
-	} else {
-		vector_free(&(queue->vector));
-	}
-}
-
-void queue_add (queue_t* queue, const void* element) {
-	vector_add(&(queue->vector), element);
-}
-
 void flush (queue_t* queue) {
 	// How many items are still in the queue
 	int queued = queue->vector.length - queue->garbage;
@@ -46,6 +34,19 @@ void flush (queue_t* queue) {
 
 	queue->vector.length = queued;
 	queue->garbage = 0;
+}
+
+void queue_free (queue_t* queue) {
+	if (queue->ptrs) {
+		flush(queue);
+		vector_free_deep(&(queue->vector));
+	} else {
+		vector_free(&(queue->vector));
+	}
+}
+
+void queue_add (queue_t* queue, const void* element) {
+	vector_add(&(queue->vector), element);
 }
 
 void* queue_dequeue (queue_t* queue) {

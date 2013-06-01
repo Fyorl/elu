@@ -89,6 +89,7 @@ static char* test_queue_ptrs () {
 
 	char* dq = queue_dequeue(&queue);
 	mu_assert("pointers not equal", dq == alloc);
+	free(dq);
 
 	queue_free(&queue);
 

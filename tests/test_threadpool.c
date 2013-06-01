@@ -13,6 +13,8 @@ void tt__worker (void* data) {
 		tt__worker_count++;
 		pthread_mutex_unlock(&tt__count_mutex);
 	}
+
+	free(data);
 }
 
 static char* test_threadpool_destroy () {

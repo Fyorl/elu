@@ -112,7 +112,7 @@ void threadpool_init (threadpool_t* threadpool, int num_threads, queue_t* queue,
 void threadpool_destroy (threadpool_t* threadpool) {
 	pthread_mutex_lock(&(threadpool->terminate_mutex));
 	threadpool->terminate = 1;
-	pthread_unmutex_lock(&(threadpool->terminate_mutex));
+	pthread_mutex_unlock(&(threadpool->terminate_mutex));
 
 	// Wake up all the threads and wait for them to terminate.
 	int i;
@@ -124,5 +124,7 @@ void threadpool_destroy (threadpool_t* threadpool) {
 	free(threadpool->threads);
 	free(threadpool->notifications);
 	free(threadpool->notify_mutexes);
+	free(threadpool->thread_status);
+	free(threadpool->status_mutexes);
 	queue_free(threadpool->queue);
 }
