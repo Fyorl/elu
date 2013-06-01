@@ -5,6 +5,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "vendor/sqlite3.h"
+
 #include "connection.h"
 #include "config.h"
 #include "threadpool.h"
