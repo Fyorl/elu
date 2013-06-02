@@ -28,6 +28,8 @@ void parse_lines (const char* line, void* data) {
 		field = &(global_config->nick);
 	} else if (strcmp("pass", key) == 0) {
 		field = &(global_config->pass);
+	} else if (strcmp("command_char", key) == 0) {
+		field = &(global_config->command_char);
 	}
 
 	// If field is null then our key is not one we can just store as a straight

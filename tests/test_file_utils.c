@@ -27,7 +27,7 @@ static char* test_file_get_lines () {
 	file_get_lines("../example.conf", &tfu__callback);
 
 	mu_assert("1st line != 'host=irc.rizon.net'", strcmp("host=irc.rizon.net", tfu__str1) == 0);
-	mu_assert("4th line != 'channels=#impsvillage'", strcmp("channels=#impsvillage", tfu__str2) == 0);
+	mu_assert("4th line != 'command_char=`'", strcmp("command_char=`", tfu__str2) == 0);
 
 	return 0;
 }

@@ -8,6 +8,7 @@ typedef struct config_t {
 	char* host;
 	char* nick;
 	char* pass;
+	char* command_char;
 	vector_t channels;
 	uint16_t port;
 } config_t;
