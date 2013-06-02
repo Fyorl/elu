@@ -7,6 +7,7 @@
 
 #include "connection.h"
 #include "config.h"
+#include "elu.h"
 #include "irc.h"
 #include "threadpool.h"
 
@@ -15,6 +16,9 @@
 #define TRUE 1
 #define FALSE 0
 #define RECEIVE_BUFFER_SIZE 1024
+
+extern int sock;
+extern config_t* config;
 
 int main (int argc, char** argv) {
 	queue_t queue;
@@ -26,10 +30,11 @@ int main (int argc, char** argv) {
 	threadpool_t threadpool;
 	threadpool_init(&threadpool, 1, &queue, &irc_handle_chunk);
 
-	config_t config;
-	read_config(&config, CONFIG_FILE);
+	config_t config_in;
+	config = &config_in;
+	read_config(config, CONFIG_FILE);
 
-	int sock = establish_connection(config.host, config.port);
+	sock = establish_connection(config->host, config->port);
 
 	int bytes_received;
 	char bytes_in[RECEIVE_BUFFER_SIZE];
@@ -62,7 +67,7 @@ int main (int argc, char** argv) {
 		threadpool_add_work(&threadpool, &work);
 	}
 
-	config_destroy(&config);
+	config_destroy(config);
 	threadpool_destroy(&threadpool);
 	return EXIT_SUCCESS;
 }

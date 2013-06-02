@@ -13,7 +13,7 @@ config_t* global_config;
 void parse_lines (const char* line, void* data) {
 	vector_t vector;
 	vector_init(&vector, sizeof(char*));
-	string_split(&vector, line, '=');
+	string_split(&vector, line, "=");
 
 	// We split each line of the config file by the '='. The first element is
 	// the key and the second is the value.
@@ -40,7 +40,7 @@ void parse_lines (const char* line, void* data) {
 			// The channels we can just store as a vector by splitting on the
 			// comma.
 			vector_init(&(global_config->channels), sizeof(char*));
-			string_split(&(global_config->channels), value, ',');
+			string_split(&(global_config->channels), value, ",");
 		}
 	} else {
 		// If we can just store it as a string then allocate some permanent

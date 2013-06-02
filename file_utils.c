@@ -78,7 +78,7 @@ void file_split_lines (const char* chunk, int len, int eof, void* line_handler) 
 		n = 0;
 	}
 
-	string_split_cb((strsplit_cb) line_handler, NULL, data, '\n');
+	string_split_cb((strsplit_cb) line_handler, NULL, data, "\n");
 	free(data);
 }
 

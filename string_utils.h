@@ -7,8 +7,8 @@
 
 typedef void (*strsplit_cb)(const char*, void*);
 
-void string_split_cb (strsplit_cb callback, void* cb_data, const char* string, char delimiter);
-void string_split (vector_t* vector, const char* string, char delimiter);
+void string_split_cb (strsplit_cb callback, void* cb_data, const char* string, const char* delimiter);
+void string_split (vector_t* vector, const char* string, const char* delimiter);
 int strpos (const char* string, const char* substring);
 
 #endif

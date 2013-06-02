@@ -18,7 +18,7 @@ void tsu__callback (const char* string, void* data) {
 }
 
 static char* test_string_split_cb () {
-	string_split_cb(&tsu__callback, NULL, "abcdef", 'd');
+	string_split_cb(&tsu__callback, NULL, "abcdef", "d");
 	mu_assert("split[0] != 'abc'", strcmp("abc", tsu__str1) == 0);
 	mu_assert("split[1] != 'ef'", strcmp("ef", tsu__str2) == 0);
 
@@ -30,7 +30,7 @@ static char* test_string_split () {
 
 	// Test simple split.
 	vector_init(&vector, sizeof(char*));
-	string_split(&vector, "abcdef", 'd');
+	string_split(&vector, "abcdef", "d");
 
 	mu_assert("vector[0] != 'abc'", strcmp("abc", vector_get(vector, 0, char*)) == 0);
 	mu_assert("vector[1] != 'ef'", strcmp("ef", vector_get(vector, 1, char*)) == 0);
@@ -39,7 +39,7 @@ static char* test_string_split () {
 
 	// Test string containing no delimiter.
 	vector_init(&vector, sizeof(char*));
-	string_split(&vector, "abcdef", 'g');
+	string_split(&vector, "abcdef", "g");
 
 	mu_assert("vector[0] != 'abcdef'", strcmp("abcdef", vector_get(vector, 0, char*)) == 0);
 
@@ -48,11 +48,11 @@ static char* test_string_split () {
 	// Test string containing delimiters in various places.
 	vector_init(&vector, sizeof(char*));
 
-	string_split(&vector, "aaaa", 'a');
+	string_split(&vector, "aaaa", "a");
 	mu_assert("vector len != 0", vector.length == 0);
 
-	string_split(&vector, "abba", 'b');
-	string_split(&vector, "abba", 'a');
+	string_split(&vector, "abba", "b");
+	string_split(&vector, "abba", "a");
 
 	mu_assert("vector[0] != 'a'", strcmp("a", vector_get(vector, 0, char*)) == 0);
 	mu_assert("vector[1] != 'a'", strcmp("a", vector_get(vector, 1, char*)) == 0);

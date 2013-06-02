@@ -1,11 +1,46 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
+#include "elu.h"
 #include "string_utils.h"
 
-void irc_register () {
+extern int sock;
+extern config_t* config;
 
+int irc_send_raw (const char* msg) {
+	int bytes_written = write(sock, msg, strlen(msg));
+
+	if (bytes_written < 1) {
+		fprintf(stderr, "Error writing message to socket.\n");
+	}
+
+	return bytes_written;
+}
+
+int irc_send_privmsg (const char* channel, const char* msg) {
+	char raw[1024];
+	snprintf(raw, 1024, "PRIVMSG %s :%s\r\n", channel, msg);
+	return irc_send_raw(raw);
+}
+
+void irc_register () {
+	char msg[1024];
+	snprintf(msg, 1024, "NICK %s\r\nUSER %s 8 * : %s\r\n", config->nick, config->nick, config->nick);
+	irc_send_raw(msg);
+}
+
+void identify () {
+	char pass[1024];
+	snprintf(pass, 1024, "id %s", config->pass);
+	irc_send_privmsg("nickserv", pass);
+}
+
+void pong () {
+	char msg[1024];
+	snprintf(msg, 1024, "PONG : %s\r\n", config->host);
+	irc_send_raw(msg);
 }
 
 void filter (char* string) {
@@ -13,10 +48,14 @@ void filter (char* string) {
 	// on to the appropriate function.
 	vector_t colon_split;
 	vector_init(&colon_split, sizeof(char*));
-	string_split(&colon_split, string, ':');
+	string_split(&colon_split, string, ":");
 
 	if (strpos(vector_get(colon_split, 0, char*), "439 *") > -1) {
 		irc_register();
+	} else if (strpos(vector_get(colon_split, 0, char*), "001") > -1) {
+		identify();
+	} else if (strpos(vector_get(colon_split, 0, char*), "PING") > -1) {
+		pong();
 	}
 
 	vector_free_deep(&colon_split);
@@ -27,7 +66,7 @@ void irc_handle_chunk (void* chunk) {
 	// those lines before sending it to the filter function.
 	vector_t lines;
 	vector_init(&lines, sizeof(char*));
-	string_split(&lines, chunk, '\n');
+	string_split(&lines, chunk, "\r\n");
 
 	int i;
 	for (i = 0; i < lines.length; i++) {
