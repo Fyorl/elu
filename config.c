@@ -59,3 +59,10 @@ void read_config (config_t* config, const char* filename) {
 	global_config = config;
 	file_get_lines(filename, &parse_lines);
 }
+
+void config_destroy (config_t* config) {
+	free(config->host);
+	free(config->nick);
+	free(config->pass);
+	vector_free_deep(&(config->channels));
+}

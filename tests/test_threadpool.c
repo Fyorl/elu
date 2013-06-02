@@ -74,6 +74,8 @@ static char* test_threadpool_single () {
 		threadpool_add_work(&threadpool, &i);
 	}
 
+	threadpool_destroy(&threadpool);
+
 	mu_assert("the work was not received in order", tt__work_in_order);
 
 	return 0;

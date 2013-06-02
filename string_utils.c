@@ -61,3 +61,33 @@ void string_split_cb (strsplit_cb callback, void* cb_data, const char* string, c
 void string_split (vector_t* vector, const char* string, char delimiter) {
 	string_split_cb(&strsplit_construct_vector, vector, string, delimiter);
 }
+
+int strpos (const char* string, const char* substring) {
+	// Find the earliest occurrence of substring in string.
+	if (strlen(string) < strlen(substring)) {
+		return -1;
+	}
+
+	int start = -1;
+	int n = 0;
+	int i;
+
+	for (i = 0; i < strlen(string); i++) {
+		if (substring[n] == '\0') {
+			return start;
+		}
+
+		if (substring[n] == string[i]) {
+			if (n == 0) {
+				start = i;
+			}
+
+			n++;
+		} else {
+			n = 0;
+			start = -1;
+		}
+	}
+
+	return start;
+}

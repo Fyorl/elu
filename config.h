@@ -13,5 +13,6 @@ typedef struct config_t {
 } config_t;
 
 void read_config (config_t* config, const char* filename);
+void config_destroy (config_t* config);
 
 #endif

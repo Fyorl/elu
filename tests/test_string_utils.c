@@ -64,8 +64,21 @@ static char* test_string_split () {
 	return 0;
 }
 
+static char* test_strpos () {
+	char* string = "abcdef";
+
+	mu_assert("cannot find substring at start", strpos(string, "ab") == 0);
+	mu_assert("cannot find substring in middle", strpos(string, "cde") == 2);
+	mu_assert("cannot find substring at end", strpos(string, "f") == 5);
+	mu_assert("no fail on substring > string", strpos(string, "abcdefg") == -1);
+	mu_assert("cannot find substring if length == string", strpos(string, string) == 0);
+
+	return 0;
+}
+
 static char* test_string_utils () {
 	mu_run_test(test_string_split_cb);
 	mu_run_test(test_string_split);
+	mu_run_test(test_strpos);
 	return 0;
 }

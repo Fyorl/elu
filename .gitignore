@@ -1,3 +1,6 @@
 bot.conf
 elu
 tests/run
+*.o
+compile
+tests/compile
