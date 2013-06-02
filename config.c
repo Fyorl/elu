@@ -66,5 +66,6 @@ void config_destroy (config_t* config) {
 	free(config->host);
 	free(config->nick);
 	free(config->pass);
+	free(config->command_char);
 	vector_free_deep(&(config->channels));
 }

@@ -12,4 +12,4 @@ Or with the following for a release build:
 ```$ gcc -s -O3 -o elu *.c vendor/*.c -lpthread -ldl```
 
 To compile the tests, run the following in the tests/ directory:
-```$ gcc -Wall -Werror -ggdb -o run run.c -lpthread -ldl```
+```$ gcc -Wall -Werror -ggdb -o run run.c ../vendor/city.c -lpthread -ldl```

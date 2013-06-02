@@ -7,6 +7,7 @@
 #include "test_config.c"
 #include "test_queue.c"
 #include "test_threadpool.c"
+#include "test_hash_map.c"
 
 int tests_run = 0;
 
@@ -17,6 +18,7 @@ static char* all_tests () {
 	mu_run_test(test_config);
 	mu_run_test(test_queue);
 	mu_run_test(test_threadpool);
+	mu_run_test(test_hash_map);
 	return 0;
 }
 
