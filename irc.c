@@ -32,9 +32,16 @@ void irc_register () {
 }
 
 void identify () {
-	char pass[1024];
-	snprintf(pass, 1024, "id %s", config->pass);
-	irc_send_privmsg("nickserv", pass);
+	char msg[1024];
+	snprintf(msg, 1024, "id %s", config->pass);
+	irc_send_privmsg("nickserv", msg);
+
+	// Join channels.
+	int i;
+	for (i = 0; i < config->channels.length; i++) {
+		snprintf(msg, 1024, "JOIN %s\r\n", vector_get(config->channels, i, char*));
+		irc_send_raw(msg);
+	}
 }
 
 void pong () {
