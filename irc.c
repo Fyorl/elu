@@ -3,11 +3,13 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "alias_map.h"
 #include "elu.h"
 #include "string_utils.h"
 
 extern int sock;
 extern config_t* config;
+extern hashmap_t alias_map;
 
 int irc_send_raw (const char* msg) {
 	int bytes_written = write(sock, msg, strlen(msg));
@@ -50,6 +52,64 @@ void pong () {
 	irc_send_raw(msg);
 }
 
+void privmsg (const char* string) {
+	vector_t colon_split;
+	vector_init(&colon_split, sizeof(char*));
+
+	vector_t space_split;
+	vector_init(&space_split, sizeof(char*));
+
+	vector_t bang_split;
+	vector_init(&bang_split, sizeof(char*));
+
+	string_split(&colon_split, string, ":");
+	string_split(&space_split, vector_get(colon_split, 0, char*), " ");
+	string_split(&bang_split, vector_get(space_split, 0, char*), "!");
+
+	char* nick = vector_get(bang_split, 0, char*);
+	char* channel = vector_get(space_split, 2, char*);
+	char* msg = vector_get(colon_split, 1, char*);
+
+	char* store_nick;
+	char* store_channel;
+	char* store_msg;
+
+	int space;
+	char* cmd;
+	alias func;
+
+	if (msg[0] == config->command_char[0]) {
+		space = strpos(msg, " ");
+		if (space < 0) {
+			space = strlen(msg);
+		}
+
+		cmd = calloc(space, sizeof(char));
+		strncpy(cmd, msg + 1, space - 1);
+		cmd[space - 1] = '\0';
+
+		func = hashmap_get(&alias_map, cmd);
+		if (func == NULL) {
+			// Look it up in custom alias table
+		} else {
+			store_nick = calloc(strlen(nick) + 1, sizeof(char));
+			strcpy(store_nick, nick);
+			store_channel = calloc(strlen(channel) + 1, sizeof(char));
+			strcpy(store_channel, channel);
+			store_msg = calloc(strlen(msg) + 1, sizeof(char));
+			strcpy(store_msg, msg);
+
+			(*((alias*) func))(store_nick, store_channel, store_msg);
+		}
+
+		free(cmd);
+	}
+
+	vector_free_deep(&bang_split);
+	vector_free_deep(&space_split);
+	vector_free_deep(&colon_split);
+}
+
 void filter (char* string) {
 	// Try to determine if the string is interesting or not and, if so, pass it
 	// on to the appropriate function.
@@ -57,12 +117,16 @@ void filter (char* string) {
 	vector_init(&colon_split, sizeof(char*));
 	string_split(&colon_split, string, ":");
 
-	if (strpos(vector_get(colon_split, 0, char*), "439 *") > -1) {
+	char* irc_command = vector_get(colon_split, 0, char*);
+
+	if (strpos(irc_command, "439 *") > -1) {
 		irc_register();
-	} else if (strpos(vector_get(colon_split, 0, char*), "001") > -1) {
+	} else if (strpos(irc_command, "001") > -1) {
 		identify();
-	} else if (strpos(vector_get(colon_split, 0, char*), "PING") > -1) {
+	} else if (strpos(irc_command, "PING") > -1) {
 		pong();
+	} else if (strpos(irc_command, "PRIVMSG") > -1) {
+		privmsg(string);
 	}
 
 	vector_free_deep(&colon_split);

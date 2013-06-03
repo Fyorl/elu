@@ -2,6 +2,7 @@
 #define __CONFIG_H
 
 #include <stdint.h>
+#include "hash_map.h"
 #include "vector.h"
 
 typedef struct config_t {
@@ -10,6 +11,7 @@ typedef struct config_t {
 	char* pass;
 	char* command_char;
 	vector_t channels;
+	hashmap_t admins;
 	uint16_t port;
 } config_t;
 

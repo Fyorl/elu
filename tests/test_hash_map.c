@@ -2,6 +2,11 @@
 #include "minunit.h"
 #include "../hash_map.c"
 
+typedef char* (*thm__func)(const char*, const char*, const char*);
+char* thm__dummy (const char* a, const char* b, const char* c) {
+	return 0;
+}
+
 static char* test_hashmap_init () {
 	hashmap_t hashmap;
 	hashmap_init(&hashmap, sizeof(int), 64);
@@ -19,6 +24,8 @@ static char* test_hashmap_get () {
 	// Test replacement.
 	hashmap_t hashmap;
 	hashmap_init(&hashmap, sizeof(int), 64);
+
+	mu_assert("invalid missing key return", hashmap_get(&hashmap, "doesn't exist") == NULL);
 
 	int value = 42;
 	hashmap_put(&hashmap, "a", &value);
@@ -65,9 +72,23 @@ static char* test_hashmap_get () {
 	return 0;
 }
 
+static char* test_hashmap_func_ptr () {
+	hashmap_t hashmap;
+	hashmap_init(&hashmap, sizeof(thm__func), 64);
+	thm__func value = thm__dummy;
+	hashmap_put(&hashmap, "func", &value);
+
+	mu_assert("function pointers not equal", thm__dummy == hashmap_value(&hashmap, "func", thm__func));
+
+	hashmap_destroy(&hashmap);
+
+	return 0;
+}
+
 static char* test_hash_map () {
 	mu_run_test(test_hashmap_init);
 	mu_run_test(test_hashmap_get);
+	mu_run_test(test_hashmap_func_ptr);
 
 	return 0;
 }

@@ -5,12 +5,17 @@
 
 #include "config.h"
 #include "file_utils.h"
+#include "hash_map.h"
 #include "vector.h"
 
 // We declare a global config here so that the callback can access it.
 config_t* global_config;
 
 void parse_lines (const char* line, void* data) {
+	vector_t admin_split;
+	char* store_admin;
+	int i;
+
 	vector_t vector;
 	vector_init(&vector, sizeof(char*));
 	string_split(&vector, line, "=");
@@ -43,6 +48,19 @@ void parse_lines (const char* line, void* data) {
 			// comma.
 			vector_init(&(global_config->channels), sizeof(char*));
 			string_split(&(global_config->channels), value, ",");
+		} else if (strcmp("admins", key) == 0) {
+			hashmap_init(&(global_config->admins), sizeof(int), 64);
+			vector_init(&admin_split, sizeof(char*));
+			string_split(&admin_split, value, ",");
+
+			for (i = 0; i < admin_split.length; i++) {
+				store_admin = calloc(strlen(vector_get(admin_split, i, char*)) + 1, sizeof(char));
+				strcpy(store_admin, vector_get(admin_split, i, char*));
+				hashmap_put(&(global_config->admins), store_admin, &i);
+				free(store_admin);
+			}
+
+			vector_free_deep(&admin_split);
 		}
 	} else {
 		// If we can just store it as a string then allocate some permanent
@@ -67,5 +85,6 @@ void config_destroy (config_t* config) {
 	free(config->nick);
 	free(config->pass);
 	free(config->command_char);
+	hashmap_destroy(&(config->admins));
 	vector_free_deep(&(config->channels));
 }

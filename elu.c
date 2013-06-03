@@ -5,10 +5,12 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "alias_map.h"
 #include "connection.h"
 #include "config.h"
 #include "elu.h"
 #include "irc.h"
+#include "string_utils.h"
 #include "threadpool.h"
 
 #define CONFIG_FILE "bot.conf"
@@ -19,6 +21,31 @@
 
 extern int sock;
 extern config_t* config;
+extern hashmap_t alias_map;
+
+int quit (const char* string) {
+	int pos_colon = strpos(string + 1, ":");
+	int pos_privmsg = strpos(string, "PRIVMSG");
+	int pos_bang = strpos(string, "!");
+	int pos_quit = strpos(string, "`quit");
+
+	char* nick;
+
+	if (pos_colon > -1 && pos_privmsg > -1 && pos_privmsg < pos_colon && pos_quit == pos_colon + 2) {
+		nick = calloc(pos_bang, sizeof(char));
+		memmove(nick, string + 1, (pos_bang - 1) * sizeof(char));
+		nick[pos_bang - 1] = '\0';
+
+		if (hashmap_get(&(config->admins), nick) != NULL) {
+			free(nick);
+			return 1;
+		}
+
+		free(nick);
+	}
+
+	return 0;
+}
 
 int main (int argc, char** argv) {
 	queue_t queue;
@@ -34,6 +61,8 @@ int main (int argc, char** argv) {
 	config = &config_in;
 	read_config(config, CONFIG_FILE);
 
+	map_aliases(&alias_map);
+
 	sock = establish_connection(config->host, config->port);
 
 	int bytes_received;
@@ -44,9 +73,7 @@ int main (int argc, char** argv) {
 		// Receive up to RECEIVE_BUFFER_SIZE bytes of data from the server
 		bytes_received = recv(sock, bytes_in, RECEIVE_BUFFER_SIZE - 1, 0);
 
-		if (bytes_received < 0) {
-			perror("Error on socket");
-		} else if (bytes_received == 0) {
+		if (bytes_received < 1) {
 			printf("Connection terminated. Shutting down.\n");
 			break;
 		}
@@ -60,6 +87,14 @@ int main (int argc, char** argv) {
 		// get them from the server.
 		fflush(stdout);
 
+		// Have to hack in the `quit command here since implementing it through
+		// the proper pipeline is way more effort than necessary.
+		// We only really want this for valgrind anyway so we can remove it
+		// from production.
+		if (quit(bytes_in)) {
+			break;
+		}
+
 		// Copy the data into some heap memory to pass to the threadpool to
 		// deal with.
 		work = calloc(bytes_received + 1, sizeof(char));
@@ -69,5 +104,6 @@ int main (int argc, char** argv) {
 
 	config_destroy(config);
 	threadpool_destroy(&threadpool);
+	hashmap_destroy(&alias_map);
 	return EXIT_SUCCESS;
 }
