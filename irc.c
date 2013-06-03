@@ -53,26 +53,21 @@ void pong () {
 }
 
 void privmsg (const char* string) {
-	vector_t colon_split;
-	vector_init(&colon_split, sizeof(char*));
-
 	vector_t space_split;
 	vector_init(&space_split, sizeof(char*));
 
 	vector_t bang_split;
 	vector_init(&bang_split, sizeof(char*));
 
-	string_split(&colon_split, string, ":");
-	string_split(&space_split, vector_get(colon_split, 0, char*), " ");
+	string_split(&space_split, string + 1, " ");
 	string_split(&bang_split, vector_get(space_split, 0, char*), "!");
 
 	char* nick = vector_get(bang_split, 0, char*);
 	char* channel = vector_get(space_split, 2, char*);
-	char* msg = vector_get(colon_split, 1, char*);
 
-	char* store_nick;
-	char* store_channel;
-	char* store_msg;
+	int colon_pos = strpos(string + 1, ":");
+	char* msg = calloc(strlen(string) - colon_pos - 1, sizeof(char));
+	strcpy(msg, string + colon_pos + 2);
 
 	int space;
 	char* cmd;
@@ -92,25 +87,15 @@ void privmsg (const char* string) {
 		if (func == NULL) {
 			// Look it up in custom alias table
 		} else {
-			store_nick = calloc(strlen(nick) + 1, sizeof(char));
-			strcpy(store_nick, nick);
-			store_channel = calloc(strlen(channel) + 1, sizeof(char));
-			strcpy(store_channel, channel);
-			store_msg = calloc(strlen(msg) + 1, sizeof(char));
-			strcpy(store_msg, msg);
-
-			(*((alias*) func))(store_nick, store_channel, store_msg);
-			free(store_nick);
-			free(store_channel);
-			free(store_msg);
+			(*((alias*) func))(nick, channel, msg);
 		}
 
 		free(cmd);
 	}
 
+	free(msg);
 	vector_free_deep(&bang_split);
 	vector_free_deep(&space_split);
-	vector_free_deep(&colon_split);
 }
 
 void filter (char* string) {
