@@ -6,4 +6,10 @@
 
 void map_aliases (hashmap_t* map) {
 	hashmap_init(map, sizeof(alias), 64);
+
+	alias func = alias_say;
+	hashmap_put(map, "say", &func);
+
+	func = alias_reply;
+	hashmap_put(map, "reply", &func);
 }

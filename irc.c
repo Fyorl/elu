@@ -100,6 +100,9 @@ void privmsg (const char* string) {
 			strcpy(store_msg, msg);
 
 			(*((alias*) func))(store_nick, store_channel, store_msg);
+			free(store_nick);
+			free(store_channel);
+			free(store_msg);
 		}
 
 		free(cmd);
@@ -146,4 +149,15 @@ void irc_handle_chunk (void* chunk) {
 
 	vector_free_deep(&lines);
 	free(chunk);
+}
+
+const char* irc_get_arg (const char* msg) {
+	int space_pos = strpos(msg, " ");
+	int total_len = strlen(msg);
+
+	if (space_pos > -1) {
+		return msg + space_pos + 1;
+	} else {
+		return msg + total_len;
+	}
 }
