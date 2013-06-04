@@ -3,12 +3,14 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #include "alias_map.h"
 #include "connection.h"
 #include "config.h"
 #include "elu.h"
+#include "file_utils.h"
 #include "irc.h"
 #include "string_utils.h"
 #include "threadpool.h"
@@ -22,6 +24,7 @@
 extern int sock;
 extern config_t* config;
 extern hashmap_t alias_map;
+extern sqlite3* db;
 
 int quit (const char* string) {
 	int pos_colon = strpos(string + 1, ":");
@@ -47,6 +50,41 @@ int quit (const char* string) {
 	return 0;
 }
 
+void init_db () {
+	int file_error;
+	int sql_error;
+	FILE* db_file;
+
+	// Check if the database has any data in, otherwise we must create the
+	// tables.
+	struct stat file_info;
+	file_error = stat("db/main.sl3", &file_info);
+
+	if (file_error < 0) {
+		// File possibly doesn't exist. We should try to create it.
+		db_file = fopen("db/main.sl3", "w+");
+		fclose(db_file);
+
+		if (db_file == NULL) {
+			fprintf(stderr, "Database creation failed due to lack of permissions.\n");
+		}
+	}
+
+	sql_error = sqlite3_open("db/main.sl3", &db);
+
+	if (sql_error) {
+		fprintf(stderr, "Unable to open database.\n");
+	}
+
+	if (file_info.st_size > 0) {
+		return;
+	}
+
+	char* tbl_timers = file_get_contents("db/timers.sql");
+	sql_error = sqlite3_exec(db, tbl_timers, NULL, NULL, NULL);
+	free(tbl_timers);
+}
+
 int main (int argc, char** argv) {
 	queue_t queue;
 	queue_init(&queue, sizeof(char*), 1);
@@ -62,6 +100,7 @@ int main (int argc, char** argv) {
 	read_config(config, CONFIG_FILE);
 
 	map_aliases(&alias_map);
+	init_db();
 
 	sock = establish_connection(config->host, config->port);
 
@@ -102,6 +141,7 @@ int main (int argc, char** argv) {
 		threadpool_add_work(&threadpool, &work);
 	}
 
+	sqlite3_close(db);
 	config_destroy(config);
 	threadpool_destroy(&threadpool);
 	hashmap_destroy(&alias_map);

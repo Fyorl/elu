@@ -4,3 +4,4 @@ tests/run
 *.o
 compile
 tests/compile
+db/main.sl3

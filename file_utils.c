@@ -6,6 +6,11 @@
 #include "file_utils.h"
 #include "string_utils.h"
 
+struct return_buf {
+	char* buf;
+	int len;
+} collect;
+
 /*
  * Simply reads a file in chunks of bytes and sends each chunk to a given
  * function to deal with.
@@ -88,4 +93,41 @@ void file_split_lines (const char* chunk, int len, int eof, void* line_handler) 
  */
 void file_get_lines (const char* filename, strsplit_cb line_handler) {
 	read_file(filename, &file_split_lines, line_handler);
+}
+
+void file_collect (const char* chunk, int len, int eof, void* data) {
+	struct return_buf* collect = data;
+	int extra = 0;
+	char* alloc;
+
+	if (eof) {
+		// Allocate an extra byte if this is the last chunk so we can add the
+		// null character to terminate the string.
+		extra = 1;
+	}
+
+	if (collect->len == 0) {
+		collect->buf = calloc(len + extra, sizeof(char));
+	} else {
+		alloc = realloc(collect->buf, (collect->len + len + extra) * sizeof(char));
+
+		if (alloc == NULL) {
+			fprintf(stderr, "Error allocating memory in file_collect.");
+		} else {
+			collect->buf = alloc;
+		}
+	}
+
+	memmove(collect->buf + collect->len, chunk, len * sizeof(char));
+	collect->len += len;
+}
+
+char* file_get_contents (const char* filename) {
+	struct return_buf collect;
+	collect.len = 0;
+
+	read_file(filename, &file_collect, &collect);
+	collect.buf[collect.len] = '\0';
+
+	return collect.buf;
 }

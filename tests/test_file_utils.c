@@ -44,8 +44,19 @@ static char* test_multi_chunk_file () {
 	return 0;
 }
 
+static char* test_file_get_contents () {
+	char* contents = file_get_contents("multi_chunk_file");
+
+	mu_assert("file_get_contents file beginning corrupt", contents[0] == '0');
+	mu_assert("file_get_contents file end corrupt", strcmp(contents + 9125, "2047") == 0);
+
+	return 0;
+}
+
 static char* test_file_utils () {
 	mu_run_test(test_file_get_lines);
 	mu_run_test(test_multi_chunk_file);
+	mu_run_test(test_file_get_contents);
+
 	return 0;
 }

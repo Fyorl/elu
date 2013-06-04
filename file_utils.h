@@ -10,5 +10,6 @@ typedef void (*read_file_cb)(const char*, int, int, void*);
 
 void read_file (const char* filename, read_file_cb chunk_handler, void* cb_data);
 void file_get_lines (const char* filename, strsplit_cb line_handler);
+char* file_get_contents (const char* filename);
 
 #endif
