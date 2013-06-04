@@ -76,6 +76,7 @@ void init_db () {
 		fprintf(stderr, "Unable to open database.\n");
 	}
 
+	stat("db/main.sl3", &file_info);
 	if (file_info.st_size > 0) {
 		return;
 	}
