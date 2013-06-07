@@ -11,6 +11,7 @@ typedef struct hashmap_t {
 	int capacity;
 	size_t element_size;
 	vector_t** data;
+	vector_t keys;
 } hashmap_t;
 
 void hashmap_init (hashmap_t* hashmap, size_t element_size, int capacity);

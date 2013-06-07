@@ -15,6 +15,7 @@ void hashmap_init (hashmap_t* hashmap, size_t element_size, int capacity) {
 	hashmap->element_size = element_size;
 	hashmap->capacity = capacity;
 	hashmap->data = calloc(capacity, sizeof(vector_t**));
+	vector_init(&(hashmap->keys), sizeof(char*));
 
 	if (hashmap->data == NULL) {
 		fprintf(stderr, "Unable to allocate memory for hashmap.\n");
@@ -80,6 +81,8 @@ void hashmap_put (hashmap_t* hashmap, const char* key, void* value) {
 	} else {
 		vector_add(vector, &node);
 	}
+
+	vector_add(&(hashmap->keys), &node_key);
 }
 
 void hashmap_destroy (hashmap_t* hashmap) {
@@ -103,6 +106,7 @@ void hashmap_destroy (hashmap_t* hashmap) {
 	}
 
 	free(hashmap->data);
+	vector_free(&(hashmap->keys));
 }
 
 void hashmap_destroy_deep (hashmap_t* hashmap) {
@@ -127,4 +131,5 @@ void hashmap_destroy_deep (hashmap_t* hashmap) {
 	}
 
 	free(hashmap->data);
+	vector_free(&(hashmap->keys));
 }

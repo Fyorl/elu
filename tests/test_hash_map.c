@@ -85,10 +85,28 @@ static char* test_hashmap_func_ptr () {
 	return 0;
 }
 
+static char* test_hashmap_keys () {
+	hashmap_t hashmap;
+	hashmap_init(&hashmap, sizeof(int), 64);
+
+	int val1 = 99;
+	int val2 = 100;
+	hashmap_put(&hashmap, "key1", &val1);
+	hashmap_put(&hashmap, "key2", &val2);
+
+	mu_assert("key1 not stored", strcmp("key1", vector_get(hashmap.keys, 0, char*)) == 0);
+	mu_assert("key2 not stored", strcmp("key2", vector_get(hashmap.keys, 1, char*)) == 0);
+
+	hashmap_destroy(&hashmap);
+
+	return 0;
+}
+
 static char* test_hash_map () {
 	mu_run_test(test_hashmap_init);
 	mu_run_test(test_hashmap_get);
 	mu_run_test(test_hashmap_func_ptr);
+	mu_run_test(test_hashmap_keys);
 
 	return 0;
 }
