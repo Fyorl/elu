@@ -6,10 +6,10 @@ Impsvillage IRC bot
 Rename example.conf to bot.conf and modify as desired.
 
 Compile with the following for a debug build:
-```$ gcc -Wall -Werror -ggdb -o elu *.c vendor/*.c -lpthread -ldl```
+```make debug```
 
 Or with the following for a release build:
-```$ gcc -s -O3 -o elu *.c vendor/*.c -lpthread -ldl```
+```make release```
 
-To compile the tests, run the following in the tests/ directory:
-```$ gcc -Wall -Werror -ggdb -o run run.c ../vendor/city.c -lpthread -ldl```
+To compile and run the tests, run the following:
+```make test```
