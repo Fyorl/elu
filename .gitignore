@@ -1,4 +1,5 @@
 bot.conf
+elu.exe
 elu
 tests/run
 *.o
