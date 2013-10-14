@@ -19,7 +19,7 @@ void read_file (const char* filename, read_file_cb chunk_handler, void* cb_data)
 	FILE* file = fopen(filename, "r");
 
 	if (file == NULL) {
-		fprintf(stderr, "Error opening config file for reading.\n");
+		fprintf(stderr, "Error opening %s for reading.\n", filename);
 	}
 
 	// Create a buffer to read chunks of a file at a time.

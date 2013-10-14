@@ -5,10 +5,8 @@ DEBUGFLAGS = -Wall -Werror -ggdb
 RELEASEFLAGS = -s -O3
 
 test:
-	cd tests
-	gcc $(DEBUGFLAGS) -o run run.c ../vendor/city.c $(LINKS)
-	./run
-	cd ..
+	gcc $(DEBUGFLAGS) -o tests/run tests/run.c vendor/city.c $(LINKS)
+	tests/run
 
 debug:
 	gcc $(DEBUGLFAGS) -o elu *.c vendor/*.c $(LINKS)

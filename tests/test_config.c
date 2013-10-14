@@ -3,7 +3,7 @@
 
 static char* test_read_config () {
 	config_t config;
-	read_config(&config, "../example.conf");
+	read_config(&config, "test_data/example.conf");
 
 	mu_assert("config.host != 'irc.rizon.net'", strcmp("irc.rizon.net", config.host) == 0);
 	mu_assert("config.nick != 'elu'", strcmp("elu", config.nick) == 0);
