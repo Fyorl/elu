@@ -50,6 +50,8 @@ static char* test_file_get_contents () {
 	mu_assert("file_get_contents file beginning corrupt", contents[0] == '0');
 	mu_assert("file_get_contents file end corrupt", strcmp(contents + 9125, "2047") == 0);
 
+	free(contents);
+
 	return 0;
 }
 
