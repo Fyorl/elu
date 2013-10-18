@@ -2,6 +2,7 @@ bot.conf
 elu.exe
 elu
 tests/run
+tests/run.exe
 *.o
 compile
 tests/compile

@@ -1,9 +1,12 @@
 #include <netinet/in.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 #include "alias_map.h"
@@ -16,10 +19,7 @@
 #include "threadpool.h"
 
 #define CONFIG_FILE "bot.conf"
-
-#define TRUE 1
-#define FALSE 0
-#define RECEIVE_BUFFER_SIZE 1024
+#define RECEIVE_BUFFER_SIZE 2048
 
 extern int sock;
 extern config_t* config;
@@ -90,11 +90,8 @@ int main (int argc, char** argv) {
 	queue_t queue;
 	queue_init(&queue, sizeof(char*), 1);
 
-	// We only want a 'threadpool' of size one as we still want to process
-	// messages in order but we don't want our main data receiving loop to have
-	// to wait for a message to be processed before reading from the socket.
 	threadpool_t threadpool;
-	threadpool_init(&threadpool, 1, &queue, &irc_handle_chunk);
+	threadpool_init(&threadpool, THREADS, &queue, &irc_handle_chunk);
 
 	config_t config_in;
 	config = &config_in;
@@ -109,7 +106,7 @@ int main (int argc, char** argv) {
 	char bytes_in[RECEIVE_BUFFER_SIZE];
 	char* work;
 
-	while (TRUE) {
+	while (true) {
 		// Receive up to RECEIVE_BUFFER_SIZE bytes of data from the server
 		bytes_received = recv(sock, bytes_in, RECEIVE_BUFFER_SIZE - 1, 0);
 

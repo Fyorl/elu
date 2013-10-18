@@ -9,7 +9,7 @@ test:
 	tests/run
 
 debug:
-	gcc $(DEBUGLFAGS) -o elu *.c vendor/*.c $(LINKS)
+	gcc $(DEBUGFLAGS) -o elu *.c vendor/*.c $(LINKS)
 
 release:
 	gcc $(RELEASEFLAGS) -o elu *.c vendor/*.c $(LINKS)
