@@ -22,8 +22,8 @@ void tt__ordered_worker (void* data) {
 	static int previous = -1;
 	int work = *((int*) data);
 
-	printf("%d\n", work);
 	tt__work_in_order = tt__work_in_order && (work == previous + 1);
+	previous = work;
 
 	free(data);
 }
