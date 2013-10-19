@@ -25,7 +25,7 @@ static char* test_ticker_tick () {
 
 	ticker_destroy(&ticker);
 
-	mu_assert("tick was not called twice", tti__num_ticks > 1);
+	mu_assert("tick was not called twice", tti__num_ticks == 2);
 
 	return 0;
 }

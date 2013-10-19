@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <string.h>
 
 #include "vector.h"
@@ -9,7 +10,7 @@
  * queues as linked lists but array-backed queues are faster.
  */
 
-void queue_init (queue_t* queue, size_t element_size, int ptrs) {
+void queue_init (queue_t* queue, size_t element_size, bool ptrs) {
 	vector_init(&(queue->vector), element_size);
 
 	// We need to distinguish between queues that contain basic data elements

@@ -89,7 +89,7 @@ void init_db () {
 
 int main (int argc, char** argv) {
 	queue_t queue;
-	queue_init(&queue, sizeof(char*), 1);
+	queue_init(&queue, sizeof(char*), true);
 
 	threadpool_t threadpool;
 	threadpool_init(&threadpool, THREADS, &queue, &irc_handle_chunk);
