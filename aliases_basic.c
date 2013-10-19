@@ -1,3 +1,4 @@
+#include <pthread.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -5,8 +6,11 @@
 #include "alias_map.h"
 #include "elu.h"
 #include "irc.h"
+#include "vendor/sqlite3.h"
 
 extern int sock;
+extern sqlite3* db;
+extern pthread_mutex_t db_mutex;
 
 char* alias_say (const alias_arg* params) {
 	const char* arg = irc_get_arg(params->msg);

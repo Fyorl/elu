@@ -19,6 +19,6 @@ typedef void (*ticker_handler)();
 
 void ticker_init (ticker_t* ticker, vector_t* handlers);
 void ticker_destroy (ticker_t* ticker);
-void ticker_register_handler(ticker_t* ticker, ticker_handler* handler);
+void ticker_register_handler(ticker_t* ticker, ticker_handler handler);
 
 #endif

@@ -9,13 +9,11 @@ void tti__tick () {
 
 static char* test_ticker_tick () {
 	vector_t handlers;
-	vector_init(&handlers, sizeof(ticker_handler*));
+	vector_init(&handlers, sizeof(ticker_handler));
 
 	ticker_t ticker;
 	ticker_init(&ticker, &handlers);
-
-	ticker_handler handler = tti__tick;
-	ticker_register_handler(&ticker, &handler);
+	ticker_register_handler(&ticker, tti__tick);
 
 	struct timespec spec;
 	spec.tv_sec = 2;

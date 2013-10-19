@@ -4,9 +4,9 @@
 #include "hash_map.h"
 
 typedef struct alias_arg {
-	const char* nick;
-	const char* channel;
-	const char* msg;
+	char* nick;
+	char* channel;
+	char* msg;
 	long timestamp;
 } alias_arg;
 

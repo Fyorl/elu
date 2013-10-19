@@ -17,15 +17,18 @@
 #include "irc.h"
 #include "string_utils.h"
 #include "threadpool.h"
+#include "ticker.h"
 #include "timestamp.h"
 
 #define CONFIG_FILE "bot.conf"
-#define RECEIVE_BUFFER_SIZE 2048
 
 extern int sock;
 extern config_t* config;
 extern hashmap_t alias_map;
 extern sqlite3* db;
+extern ticker_t ticker;
+extern threadpool_t executor;
+extern pthread_mutex_t db_mutex;
 
 int quit (const char* string) {
 	int pos_colon = strpos(string + 1, ":");
@@ -88,12 +91,6 @@ void init_db () {
 }
 
 int main (int argc, char** argv) {
-	queue_t queue;
-	queue_init(&queue, sizeof(char*), true);
-
-	threadpool_t threadpool;
-	threadpool_init(&threadpool, THREADS, &queue, &irc_handle_chunk);
-
 	config_t config_in;
 	config = &config_in;
 	read_config(config, CONFIG_FILE);
@@ -101,12 +98,21 @@ int main (int argc, char** argv) {
 	map_aliases(&alias_map);
 	init_db();
 
+	queue_t cmd_queue;
+	queue_init(&cmd_queue, sizeof(struct alias_runner_arg*), true);
+	threadpool_init(&executor, EXEC_THREADS, &cmd_queue, &alias_runner);
+
+	vector_t ticker_handlers;
+	vector_init(&ticker_handlers, sizeof(ticker_handler));
+	ticker_init(&ticker, &ticker_handlers);
+
+	pthread_mutex_init(&db_mutex, NULL);
+
 	sock = establish_connection(config->host, config->port);
 
 	int bytes_received;
 	char bytes_in[RECEIVE_BUFFER_SIZE];
-	char* irc_string;
-	struct irc_msg* work;
+	char* chunk;
 
 	while (true) {
 		// Receive up to RECEIVE_BUFFER_SIZE bytes of data from the server
@@ -136,18 +142,16 @@ int main (int argc, char** argv) {
 
 		// Copy the data into some heap memory to pass to the threadpool to
 		// deal with.
-		irc_string = calloc(bytes_received + 1, sizeof(char));
-		strncpy(irc_string, bytes_in, bytes_received + 1);
-		work = malloc(sizeof(struct irc_msg));
-		work->msg = irc_string;
-		work->timestamp = timestamp();
-
-		threadpool_add_work(&threadpool, &work);
+		chunk = calloc(bytes_received + 1, sizeof(char));
+		strncpy(chunk, bytes_in, bytes_received + 1);
+		
+		irc_handle_chunk(chunk, timestamp());
 	}
 
 	sqlite3_close(db);
 	config_destroy(config);
-	threadpool_destroy(&threadpool);
+	ticker_destroy(&ticker);
+	threadpool_destroy(&executor);
 	hashmap_destroy(&alias_map);
 	return EXIT_SUCCESS;
 }
