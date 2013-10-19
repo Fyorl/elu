@@ -5,6 +5,7 @@
 
 #include "alias_map.h"
 #include "elu.h"
+#include "irc.h"
 #include "string_utils.h"
 
 extern int sock;
@@ -52,7 +53,7 @@ void pong () {
 	irc_send_raw(msg);
 }
 
-void privmsg (const char* string) {
+void privmsg (const char* string, long timestamp) {
 	vector_t space_split;
 	vector_init(&space_split, sizeof(char*));
 
@@ -71,6 +72,7 @@ void privmsg (const char* string) {
 
 	int space;
 	char* cmd;
+	alias_arg* args;
 	alias func;
 
 	if (msg[0] == config->command_char[0]) {
@@ -83,11 +85,17 @@ void privmsg (const char* string) {
 		strncpy(cmd, msg + 1, space - 1);
 		cmd[space - 1] = '\0';
 
+		args = malloc(sizeof(alias_arg));
+		args->nick = nick;
+		args->channel = channel;
+		args->msg = msg;
+		args->timestamp = timestamp;
+
 		func = hashmap_get(&alias_map, cmd);
 		if (func == NULL) {
 			// Look it up in custom alias table
 		} else {
-			(*((alias*) func))(nick, channel, msg);
+			(*((alias*) func))(args);
 		}
 
 		free(cmd);
@@ -96,9 +104,10 @@ void privmsg (const char* string) {
 	free(msg);
 	vector_free_deep(&bang_split);
 	vector_free_deep(&space_split);
+	free(args);
 }
 
-void filter (char* string) {
+void filter (char* string, long timestamp) {
 	// Try to determine if the string is interesting or not and, if so, pass it
 	// on to the appropriate function.
 	vector_t colon_split;
@@ -114,22 +123,24 @@ void filter (char* string) {
 	} else if (strpos(irc_command, "PING") > -1) {
 		pong();
 	} else if (strpos(irc_command, "PRIVMSG") > -1) {
-		privmsg(string);
+		privmsg(string, timestamp);
 	}
 
 	vector_free_deep(&colon_split);
 }
 
 void irc_handle_chunk (void* chunk) {
+	struct irc_msg* msg = chunk;
+
 	// Since we sometimes receive multiple lines at once, we have to split on
 	// those lines before sending it to the filter function.
 	vector_t lines;
 	vector_init(&lines, sizeof(char*));
-	string_split(&lines, chunk, "\r\n");
+	string_split(&lines, msg->msg, "\r\n");
 
 	int i;
 	for (i = 0; i < lines.length; i++) {
-		filter(vector_get(lines, i, char*));
+		filter(vector_get(lines, i, char*), msg->timestamp);
 	}
 
 	vector_free_deep(&lines);

@@ -1,4 +1,5 @@
 #include <pthread.h>
+#include <stdbool.h>
 
 #include "threadpool.h"
 
@@ -13,7 +14,7 @@ void* worker (void* data) {
 	threadpool_t* threadpool = arg->threadpool;
 	void* element;
 
-	while (1) {
+	while (true) {
 		pthread_mutex_lock(&(threadpool->terminate_mutex));
 		if (threadpool->terminate) {
 			pthread_mutex_unlock(&(threadpool->terminate_mutex));
@@ -23,7 +24,7 @@ void* worker (void* data) {
 
 		pthread_cond_wait(&(threadpool->notifications[id]), &(threadpool->notify_mutexes[id]));
 
-		while (1) {
+		while (true) {
 			pthread_mutex_lock(&(threadpool->queue_mutex));
 			element = queue_dequeue(threadpool->queue);
 			pthread_mutex_unlock(&(threadpool->queue_mutex));

@@ -17,6 +17,7 @@
 #include "irc.h"
 #include "string_utils.h"
 #include "threadpool.h"
+#include "timestamp.h"
 
 #define CONFIG_FILE "bot.conf"
 #define RECEIVE_BUFFER_SIZE 2048
@@ -104,7 +105,8 @@ int main (int argc, char** argv) {
 
 	int bytes_received;
 	char bytes_in[RECEIVE_BUFFER_SIZE];
-	char* work;
+	char* irc_string;
+	struct irc_msg* work;
 
 	while (true) {
 		// Receive up to RECEIVE_BUFFER_SIZE bytes of data from the server
@@ -134,8 +136,12 @@ int main (int argc, char** argv) {
 
 		// Copy the data into some heap memory to pass to the threadpool to
 		// deal with.
-		work = calloc(bytes_received + 1, sizeof(char));
-		strncpy(work, bytes_in, bytes_received + 1);
+		irc_string = calloc(bytes_received + 1, sizeof(char));
+		strncpy(irc_string, bytes_in, bytes_received + 1);
+		work = malloc(sizeof(struct irc_msg));
+		work->msg = irc_string;
+		work->timestamp = timestamp();
+
 		threadpool_add_work(&threadpool, &work);
 	}
 

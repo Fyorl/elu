@@ -3,7 +3,14 @@
 
 #include "hash_map.h"
 
-typedef char* (*alias)(const char*, const char*, const char*);
+typedef struct alias_arg {
+	const char* nick;
+	const char* channel;
+	const char* msg;
+	long timestamp;
+} alias_arg;
+
+typedef char* (*alias)(const alias_arg*);
 hashmap_t alias_map;
 void map_aliases (hashmap_t* map);
 

@@ -8,6 +8,7 @@
 #include "test_queue.c"
 #include "test_threadpool.c"
 #include "test_hash_map.c"
+#include "test_ticker.c"
 
 int tests_run = 0;
 
@@ -19,6 +20,7 @@ static char* all_tests () {
 	mu_run_test(test_queue);
 	mu_run_test(test_threadpool);
 	mu_run_test(test_hash_map);
+	mu_run_test(test_ticker);
 	return 0;
 }
 
