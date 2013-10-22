@@ -14,3 +14,5 @@ debug:
 release:
 	gcc $(RELEASEFLAGS) -o elu *.c vendor/*.c $(LINKS)
 
+win32:
+	gcc -Wall -ggdb -o elu *.c vendor/*.c $(LINKS)
