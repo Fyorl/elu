@@ -50,3 +50,11 @@ char* alias_reply (const alias_arg* params) {
 
 	return 0;
 }
+
+char* alias_in (const alias_arg* params) {
+	return 0;
+}
+
+char* alias_at (const alias_arg* params) {
+	return 0;
+}

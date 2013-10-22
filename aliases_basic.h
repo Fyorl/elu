@@ -5,5 +5,7 @@
 
 char* alias_say (const alias_arg*);
 char* alias_reply (const alias_arg*);
+char* alias_in (const alias_arg*);
+char* alias_at (const alias_arg*);
 
 #endif

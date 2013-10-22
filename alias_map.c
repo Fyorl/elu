@@ -12,4 +12,10 @@ void map_aliases (hashmap_t* map) {
 
 	func = alias_reply;
 	hashmap_put(map, "reply", &func);
+	
+	func = alias_in;
+	hashmap_put(map, "in", &func);
+	
+	func = alias_at;
+	hashmap_put(map, "at", &func);
 }
