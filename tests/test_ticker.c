@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "minunit.h"
 #include "../ticker.c"
 
@@ -23,7 +22,7 @@ static char* test_ticker_tick () {
 
 	ticker_destroy(&ticker);
 
-	mu_assert("tick was not called twice", tti__num_ticks == 2);
+	mu_assert("tick was not called at least twice", tti__num_ticks > 1);
 
 	return 0;
 }
