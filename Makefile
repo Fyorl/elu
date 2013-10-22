@@ -1,6 +1,6 @@
 .PHONY: test debug release
 
-LINKS = -lpthread -ldl
+LINKS = -lpthread -ldl -lrt
 DEBUGFLAGS = -Wall -Werror -ggdb
 RELEASEFLAGS = -s -O3
 
