@@ -76,9 +76,25 @@ static char* test_strpos () {
 	return 0;
 }
 
+static char* test_string_chomp () {
+	char* string = "0 1 2";
+	
+	const char* chomp1 = string_chomp(string, " ");
+	mu_assert("chomp1 != 1 2", strcmp(chomp1, "1 2") == 0);
+	
+	const char* chomp2 = string_chomp(chomp1, " ");
+	mu_assert("chomp2 != 2", strcmp(chomp2, "2") == 0);
+	
+	const char* chomp3 = string_chomp(chomp2, " ");
+	mu_assert("chomp3 != \\0", chomp3[0] == '\0');
+	
+	return 0;
+}
+
 static char* test_string_utils () {
 	mu_run_test(test_string_split_cb);
 	mu_run_test(test_string_split);
 	mu_run_test(test_strpos);
+	mu_run_test(test_string_chomp);
 	return 0;
 }

@@ -205,14 +205,3 @@ void irc_handle_chunk (char* chunk, int64_t timestamp) {
 	vector_free_deep(&lines);
 	free(chunk);
 }
-
-const char* irc_get_arg (const char* msg) {
-	int space_pos = strpos(msg, " ");
-	int total_len = strlen(msg);
-
-	if (space_pos > -1) {
-		return msg + space_pos + 1;
-	} else {
-		return msg + total_len;
-	}
-}

@@ -35,6 +35,17 @@ int strpos (const char* string, const char* substring) {
 	return start;
 }
 
+const char* string_chomp (const char* string, const char* substring) {
+	int space_pos = strpos(string, substring);
+	int total_len = strlen(string);
+
+	if (space_pos > -1) {
+		return string + space_pos + 1;
+	} else {
+		return string + total_len;
+	}
+}
+
 void strsplit_construct_vector (const char* string, void* vector) {
 	size_t size = strlen(string) + 1;
 	char* alloc = calloc(size, sizeof(char));
