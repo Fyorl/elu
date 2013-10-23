@@ -88,6 +88,9 @@ static char* test_string_chomp () {
 	const char* chomp3 = string_chomp(chomp2, " ");
 	mu_assert("chomp3 != \\0", chomp3[0] == '\0');
 	
+	const char* chomp4 = string_chomp(chomp3, " ");
+	mu_assert("chomp4 != chomp3", chomp3 == chomp4);
+	
 	return 0;
 }
 
