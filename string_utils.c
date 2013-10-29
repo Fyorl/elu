@@ -6,11 +6,24 @@
 #include "string_utils.h"
 #include "vector.h"
 
-void string_join (char** pieces, int len, const char* delimiter, char* result) {
+void string_join (
+		char** pieces
+		, int len
+		, const char* delimiter
+		, char* result
+		, int maxlen) {
 	bool first = true;
+	int totallen = 0;
+	int addlen;
 	int i;
+
 	for (i = 0; i < len; i++) {
 		if (pieces[i] != NULL) {
+			addlen = strlen(pieces[i]) + ((first) ? strlen(delimiter) : 0);
+			if (totallen + addlen >= maxlen - 1) {
+				return;
+			}
+		
 			if (first) {
 				strcpy(result, pieces[i]);
 				first = false;
@@ -18,11 +31,13 @@ void string_join (char** pieces, int len, const char* delimiter, char* result) {
 				strcat(result, delimiter);
 				strcat(result, pieces[i]);
 			}
+			
+			totallen += addlen;
 		}
 	}
 }
 
-void string_join_english (char** pieces, int len, char* result) {
+void string_join_english (char** pieces, int len, char* result, int maxlen) {
 	// First we find the last two elements.
 	int ultimate = -1;
 	int penultimate = -1;
@@ -40,7 +55,9 @@ void string_join_english (char** pieces, int len, char* result) {
 		return;
 	}
 	
-	char* join_last = calloc(strlen(pieces[penultimate]) + strlen(pieces[ultimate]) + 6, sizeof(char));
+	char* join_last = calloc(
+		strlen(pieces[penultimate]) + strlen(pieces[ultimate]) + 6
+		, sizeof(char));
 	strcpy(join_last, pieces[penultimate]);
 	strcat(join_last, " and ");
 	strcat(join_last, pieces[ultimate]);
@@ -48,7 +65,7 @@ void string_join_english (char** pieces, int len, char* result) {
 	pieces[penultimate] = join_last;
 	pieces[ultimate] = NULL;
 	
-	string_join(pieces, len, ", ", result);
+	string_join(pieces, len, ", ", result, maxlen);
 	free(join_last);
 }
 
@@ -104,7 +121,11 @@ void strsplit_construct_vector (const char* string, void* vector) {
  * Split the given string into multiple parts based on a given delimiter. Each
  * part of the string is passed to a callback function.
  */
-void string_split_cb (strsplit_cb callback, void* cb_data, const char* string, const char* delimiter) {
+void string_split_cb (
+		strsplit_cb callback
+		, void* cb_data
+		, const char* string
+		, const char* delimiter) {
 	char buffer[STRSPLIT_MAX_ELEM_LEN];
 
 	int delimiter_len = strlen(delimiter);
@@ -140,6 +161,9 @@ void string_split_cb (strsplit_cb callback, void* cb_data, const char* string, c
  * Split a string and place the results in a vector. Just calls
  * string_split_cb with a specific callback.
  */
-void string_split (vector_t* vector, const char* string, const char* delimiter) {
+void string_split (
+		vector_t* vector
+		, const char* string
+		, const char* delimiter) {
 	string_split_cb(&strsplit_construct_vector, vector, string, delimiter);
 }

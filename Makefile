@@ -5,7 +5,7 @@ DEBUGFLAGS = -Wall -Werror -ggdb
 RELEASEFLAGS = -s -O3
 
 test:
-	gcc $(DEBUGFLAGS) -o tests/run tests/run.c timestamp.c vendor/city.c $(LINKS)
+	gcc $(DEBUGFLAGS) -o tests/run tests/run.c timestamp.c irc.c timers.c vendor/city.c $(LINKS)
 	tests/run
 
 debug:

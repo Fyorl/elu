@@ -6,6 +6,7 @@
 #include <unistd.h>
 
 #include "alias_map.h"
+#include "aliases_basic.h"
 #include "elu.h"
 #include "irc.h"
 #include "string_utils.h"

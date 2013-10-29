@@ -16,28 +16,53 @@ extern sqlite3* db;
 extern pthread_mutex_t db_mutex;
 
 char* timer_response (int days, int hours, int minutes, int seconds) {
-	char response[640];
+	char response[640] = "Timer set for ";
 	char** pieces = calloc(4, sizeof(char*));
-	bool first = true;
+	int len;
+	
+	char days_str[64];
+	char hours_str[64];
+	char minutes_str[64];
+	char seconds_str[64];
 	
 	if (days > 0) {
-		char days_str[64];
-		snprintf(days_str, 64, "%d days", days);
+		snprintf(days_str, 62, "%d day", days);
+		
+		if (days > 1) {
+			len = strlen(days_str);
+			days_str[len] = 's';
+			days_str[len + 1] = '\0';
+		}
 	}
 	
 	if (hours > 0) {
-		char hours_str[64];
-		snprintf(hours_str, 64, "%d hours", hours);
+		snprintf(hours_str, 62, "%d hour", hours);
+		
+		if (hours > 1) {
+			len = strlen(hours_str);
+			hours_str[len] = 's';
+			hours_str[len + 1] = '\0';
+		}
 	}
 	
 	if (minutes > 0) {
-		char minutes_str[64];
-		snprintf(minutes_str, 64, "%d minutes", minutes);
+		snprintf(minutes_str, 62, "%d minute", minutes);
+		
+		if (minutes > 1) {
+			len = strlen(minutes_str);
+			minutes_str[len] = 's';
+			minutes_str[len + 1] = '\0';
+		}
 	}
 	
 	if (seconds > 0) {
-		char seconds_str[64];
-		snprintf(seconds_str, 64, "%d seconds", seconds);
+		snprintf(seconds_str, 62, "%d second", seconds);
+		
+		if (seconds > 1) {
+			len = strlen(seconds_str);
+			seconds_str[len] = 's';
+			seconds_str[len + 1] = '\0';
+		}
 	}
 	
 	pieces[0] = days_str;
@@ -45,7 +70,7 @@ char* timer_response (int days, int hours, int minutes, int seconds) {
 	pieces[2] = minutes_str;
 	pieces[3] = seconds_str;
 	
-	string_join_english(pieces, 4, response);
+	string_join_english(pieces, 4, response, 638);
 	free(pieces);
 	
 	char* response_return = calloc(strlen(response) + 1, sizeof(char));
@@ -134,7 +159,23 @@ char* alias_in (const alias_arg* params) {
 		time_to_add = tmp + 1;
 	}
 	
+	// Time maths.
+	int quotient;
+	
+	quotient = seconds / 60;
+	minutes += quotient;
+	seconds -= quotient * 60;
+	
+	quotient = minutes / 60;
+	hours += quotient;
+	minutes -= quotient * 60;
+	
+	quotient = hours / 24;
+	days += quotient;
+	hours -= hours * 24;
+	
 	if (days > 0 || hours > 0 || minutes > 0 || seconds > 0) {
+		
 		return timer_response(days, hours, minutes, seconds);
 	}
 	

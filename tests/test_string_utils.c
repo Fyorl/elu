@@ -105,9 +105,13 @@ static char* test_string_join () {
 	pieces[3] = piece3;
 	
 	char result[640];
-	string_join(pieces, 4, ", ", result);
-	
+	string_join(pieces, 4, ", ", result, 640);
 	mu_assert("String join != 1, 2, 3", strcmp(result, "1, 2, 3") == 0);
+	
+	memset(result, 0, 640 * sizeof(char));
+	string_join(pieces, 4, ", ", result, 2);
+	mu_assert("String join didn't truncate", strcmp(result, "1") == 0);
+	
 	free(pieces);
 
 	return 0;
@@ -124,7 +128,7 @@ static char* test_string_join_english () {
 	pieces[3] = piece3;
 	
 	char result[640];
-	string_join_english(pieces, 4, result);
+	string_join_english(pieces, 4, result, 640);
 	
 	mu_assert("String join english != 1, 2 and 3", strcmp(result, "1, 2 and 3") == 0);
 	free(pieces);
