@@ -94,10 +94,50 @@ static char* test_string_chomp () {
 	return 0;
 }
 
+static char* test_string_join () {
+	char** pieces = calloc(4, sizeof(char*));
+	char* piece1 = "1";
+	char* piece2 = "2";
+	char* piece3 = "3";
+	
+	pieces[0] = piece1;
+	pieces[2] = piece2;
+	pieces[3] = piece3;
+	
+	char result[640];
+	string_join(pieces, 4, ", ", result);
+	
+	mu_assert("String join != 1, 2, 3", strcmp(result, "1, 2, 3") == 0);
+	free(pieces);
+
+	return 0;
+}
+
+static char* test_string_join_english () {
+	char** pieces = calloc(4, sizeof(char*));
+	char* piece1 = "1";
+	char* piece2 = "2";
+	char* piece3 = "3";
+	
+	pieces[0] = piece1;
+	pieces[1] = piece2;
+	pieces[3] = piece3;
+	
+	char result[640];
+	string_join_english(pieces, 4, result);
+	
+	mu_assert("String join english != 1, 2 and 3", strcmp(result, "1, 2 and 3") == 0);
+	free(pieces);
+
+	return 0;
+}
+
 static char* test_string_utils () {
 	mu_run_test(test_string_split_cb);
 	mu_run_test(test_string_split);
 	mu_run_test(test_strpos);
 	mu_run_test(test_string_chomp);
+	mu_run_test(test_string_join);
+	mu_run_test(test_string_join_english);
 	return 0;
 }

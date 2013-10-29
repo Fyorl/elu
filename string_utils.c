@@ -1,9 +1,56 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "string_utils.h"
 #include "vector.h"
+
+void string_join (char** pieces, int len, const char* delimiter, char* result) {
+	bool first = true;
+	int i;
+	for (i = 0; i < len; i++) {
+		if (pieces[i] != NULL) {
+			if (first) {
+				strcpy(result, pieces[i]);
+				first = false;
+			} else {
+				strcat(result, delimiter);
+				strcat(result, pieces[i]);
+			}
+		}
+	}
+}
+
+void string_join_english (char** pieces, int len, char* result) {
+	// First we find the last two elements.
+	int ultimate = -1;
+	int penultimate = -1;
+	int i;
+
+	for (i = 0; i < len; i++) {
+		if (pieces[i] != NULL) {
+			penultimate = ultimate;
+			ultimate = i;
+		}
+	}
+	
+	if (penultimate < 0) {
+		// Everything was NULL or only one element.
+		return;
+	}
+	
+	char* join_last = calloc(strlen(pieces[penultimate]) + strlen(pieces[ultimate]) + 6, sizeof(char));
+	strcpy(join_last, pieces[penultimate]);
+	strcat(join_last, " and ");
+	strcat(join_last, pieces[ultimate]);
+	
+	pieces[penultimate] = join_last;
+	pieces[ultimate] = NULL;
+	
+	string_join(pieces, len, ", ", result);
+	free(join_last);
+}
 
 int strpos (const char* string, const char* substring) {
 	// Find the earliest occurrence of substring in string.

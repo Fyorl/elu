@@ -81,7 +81,15 @@ struct ident get_nick_channel (const char* string, vector_t* space_split, vector
 
 void alias_runner (void* data) {
 	struct alias_runner_arg* params = data;
-	(*((alias*) params->func))(params->args);
+	char* response = (*((alias*) params->func))(params->args);
+	
+	if (response != NULL) {
+		// Slight hack to send the response to the reply alias which allows
+		// us some modicum of testing for aliases.
+		free(params->args->msg);
+		params->args->msg = response;
+		alias_reply(params->args);
+	}
 
 	free(params->args->nick);
 	free(params->args->channel);
