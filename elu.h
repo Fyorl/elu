@@ -25,6 +25,5 @@ ticker_t ticker;
 threadpool_t executor;
 
 sqlite3* db;
-pthread_mutex_t db_mutex;
 
 #endif

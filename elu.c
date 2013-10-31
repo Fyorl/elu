@@ -28,7 +28,6 @@ extern hashmap_t alias_map;
 extern sqlite3* db;
 extern ticker_t ticker;
 extern threadpool_t executor;
-extern pthread_mutex_t db_mutex;
 
 int quit (const char* string) {
 	int pos_colon = strpos(string + 1, ":");
@@ -105,8 +104,6 @@ int main (int argc, char** argv) {
 	vector_t ticker_handlers;
 	vector_init(&ticker_handlers, sizeof(ticker_handler));
 	ticker_init(&ticker, &ticker_handlers);
-
-	pthread_mutex_init(&db_mutex, NULL);
 
 	sock = establish_connection(config->host, config->port);
 

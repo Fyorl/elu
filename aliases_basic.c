@@ -13,7 +13,6 @@
 
 extern int sock;
 extern sqlite3* db;
-extern pthread_mutex_t db_mutex;
 
 char* timer_response (int days, int hours, int minutes, int seconds) {
 	char response[640] = "Timer set for ";

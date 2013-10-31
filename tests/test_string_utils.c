@@ -110,6 +110,7 @@ static char* test_string_join () {
 	
 	memset(result, 0, 640 * sizeof(char));
 	string_join(pieces, 4, ", ", result, 2);
+
 	mu_assert("String join didn't truncate", strcmp(result, "1") == 0);
 	
 	free(pieces);
