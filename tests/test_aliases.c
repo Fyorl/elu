@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "minunit.h"
 #include "../aliases_basic.c"
 

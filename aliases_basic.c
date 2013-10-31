@@ -14,17 +14,19 @@
 extern int sock;
 extern sqlite3* db;
 
+
 char* timer_response (int days, int hours, int minutes, int seconds) {
-	char response[640] = "Timer set for ";
+	char join[640];
 	char** pieces = calloc(4, sizeof(char*));
 	int len;
 	
-	char days_str[64];
-	char hours_str[64];
-	char minutes_str[64];
-	char seconds_str[64];
+	char* days_str = NULL;
+	char* hours_str = NULL;
+	char* minutes_str = NULL;
+	char* seconds_str = NULL;
 	
 	if (days > 0) {
+		days_str = malloc(64);
 		snprintf(days_str, 62, "%d day", days);
 		
 		if (days > 1) {
@@ -35,6 +37,7 @@ char* timer_response (int days, int hours, int minutes, int seconds) {
 	}
 	
 	if (hours > 0) {
+		hours_str = malloc(64);
 		snprintf(hours_str, 62, "%d hour", hours);
 		
 		if (hours > 1) {
@@ -45,16 +48,19 @@ char* timer_response (int days, int hours, int minutes, int seconds) {
 	}
 	
 	if (minutes > 0) {
+		minutes_str = malloc(64);
 		snprintf(minutes_str, 62, "%d minute", minutes);
 		
 		if (minutes > 1) {
 			len = strlen(minutes_str);
 			minutes_str[len] = 's';
 			minutes_str[len + 1] = '\0';
+			printf("%s\n", minutes_str);
 		}
 	}
 	
 	if (seconds > 0) {
+		seconds_str = malloc(64);
 		snprintf(seconds_str, 62, "%d second", seconds);
 		
 		if (seconds > 1) {
@@ -67,13 +73,29 @@ char* timer_response (int days, int hours, int minutes, int seconds) {
 	pieces[0] = days_str;
 	pieces[1] = hours_str;
 	pieces[2] = minutes_str;
+	printf("pieces[2] = %s\n", pieces[2]);
 	pieces[3] = seconds_str;
 	
-	string_join_english(pieces, 4, response, 638);
+	string_join_english(pieces, 4, join, 638);
+	
+	int i;
+	for (i = 0; i < 4; i++) {
+		if (pieces[i] != NULL) {
+			printf("Freeing index %d\n", i);
+			printf("%s\n", pieces[i]);
+			free(pieces[i]);
+		}
+	}
 	free(pieces);
 	
-	char* response_return = calloc(strlen(response) + 1, sizeof(char));
-	strcpy(response_return, response);
+	len = strlen(join);
+	join[len] = '.';
+	join[len + 1] = '\0';
+
+	char* response_return = calloc(strlen(join) + 15, sizeof(char));
+	strcpy(response_return, "Timer set for ");
+	strcat(response_return, join);
+	printf("\n\n");
 	
 	return response_return;
 }
@@ -174,7 +196,6 @@ char* alias_in (const alias_arg* params) {
 	hours -= hours * 24;
 	
 	if (days > 0 || hours > 0 || minutes > 0 || seconds > 0) {
-		
 		return timer_response(days, hours, minutes, seconds);
 	}
 	

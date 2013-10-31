@@ -19,8 +19,8 @@ void string_join (
 
 	for (i = 0; i < len; i++) {
 		if (pieces[i] != NULL) {
-			addlen = strlen(pieces[i]) + ((first) ? strlen(delimiter) : 0);
-			if (totallen + addlen >= maxlen - 1) {
+			addlen = strlen(pieces[i]) + ((first) ? 0 : strlen(delimiter));
+			if (totallen + addlen >= maxlen) {
 				return;
 			}
 		
@@ -50,23 +50,24 @@ void string_join_english (char** pieces, int len, char* result, int maxlen) {
 		}
 	}
 	
-	if (penultimate < 0) {
-		// Everything was NULL or only one element.
-		return;
+	char* join_last = NULL;
+	if (penultimate > -1) {
+		join_last = calloc(
+			strlen(pieces[penultimate]) + strlen(pieces[ultimate]) + 6
+			, sizeof(char));
+		strcpy(join_last, pieces[penultimate]);
+		strcat(join_last, " and ");
+		strcat(join_last, pieces[ultimate]);
+		
+		pieces[penultimate] = join_last;
+		pieces[ultimate] = NULL;
 	}
 	
-	char* join_last = calloc(
-		strlen(pieces[penultimate]) + strlen(pieces[ultimate]) + 6
-		, sizeof(char));
-	strcpy(join_last, pieces[penultimate]);
-	strcat(join_last, " and ");
-	strcat(join_last, pieces[ultimate]);
-	
-	pieces[penultimate] = join_last;
-	pieces[ultimate] = NULL;
-	
 	string_join(pieces, len, ", ", result, maxlen);
-	free(join_last);
+	
+	if (join_last != NULL) {
+		free(join_last);
+	}
 }
 
 int strpos (const char* string, const char* substring) {

@@ -32,8 +32,12 @@ static char* test_string_split () {
 	vector_init(&vector, sizeof(char*));
 	string_split(&vector, "abcdef", "d");
 
-	mu_assert("vector[0] != 'abc'", strcmp("abc", vector_get(vector, 0, char*)) == 0);
-	mu_assert("vector[1] != 'ef'", strcmp("ef", vector_get(vector, 1, char*)) == 0);
+	mu_assert(
+		"vector[0] != 'abc'"
+		, strcmp("abc", vector_get(vector, 0, char*)) == 0);
+	mu_assert(
+		"vector[1] != 'ef'"
+		, strcmp("ef", vector_get(vector, 1, char*)) == 0);
 
 	vector_free_deep(&vector);
 
@@ -41,7 +45,9 @@ static char* test_string_split () {
 	vector_init(&vector, sizeof(char*));
 	string_split(&vector, "abcdef", "g");
 
-	mu_assert("vector[0] != 'abcdef'", strcmp("abcdef", vector_get(vector, 0, char*)) == 0);
+	mu_assert(
+		"vector[0] != 'abcdef'"
+		, strcmp("abcdef", vector_get(vector, 0, char*)) == 0);
 
 	vector_free_deep(&vector);
 
@@ -54,9 +60,15 @@ static char* test_string_split () {
 	string_split(&vector, "abba", "b");
 	string_split(&vector, "abba", "a");
 
-	mu_assert("vector[0] != 'a'", strcmp("a", vector_get(vector, 0, char*)) == 0);
-	mu_assert("vector[1] != 'a'", strcmp("a", vector_get(vector, 1, char*)) == 0);
-	mu_assert("vector[2] != 'bb'", strcmp("bb", vector_get(vector, 2, char*)) == 0);
+	mu_assert(
+		"vector[0] != 'a'"
+		, strcmp("a", vector_get(vector, 0, char*)) == 0);
+	mu_assert(
+		"vector[1] != 'a'"
+		, strcmp("a", vector_get(vector, 1, char*)) == 0);
+	mu_assert(
+		"vector[2] != 'bb'"
+		, strcmp("bb", vector_get(vector, 2, char*)) == 0);
 	mu_assert("vector len != 3", vector.length == 3);
 
 	vector_free_deep(&vector);
@@ -71,7 +83,9 @@ static char* test_strpos () {
 	mu_assert("cannot find substring in middle", strpos(string, "cde") == 2);
 	mu_assert("cannot find substring at end", strpos(string, "f") == 5);
 	mu_assert("no fail on substring > string", strpos(string, "abcdefg") == -1);
-	mu_assert("cannot find substring if length == string", strpos(string, string) == 0);
+	mu_assert(
+		"cannot find substring if length == string"
+		, strpos(string, string) == 0);
 
 	return 0;
 }
@@ -110,8 +124,13 @@ static char* test_string_join () {
 	
 	memset(result, 0, 640 * sizeof(char));
 	string_join(pieces, 4, ", ", result, 2);
-
 	mu_assert("String join didn't truncate", strcmp(result, "1") == 0);
+	
+	memset(result, 0, 640 * sizeof(char));
+	pieces[2] = NULL;
+	pieces[3] = NULL;
+	string_join(pieces, 4, ", ", result, 640);
+	mu_assert("String join of one element failed", strcmp(result, "1") == 0);
 	
 	free(pieces);
 
@@ -131,7 +150,9 @@ static char* test_string_join_english () {
 	char result[640];
 	string_join_english(pieces, 4, result, 640);
 	
-	mu_assert("String join english != 1, 2 and 3", strcmp(result, "1, 2 and 3") == 0);
+	mu_assert(
+		"String join english != 1, 2 and 3"
+		, strcmp(result, "1, 2 and 3") == 0);
 	free(pieces);
 
 	return 0;
