@@ -19,12 +19,20 @@ static char* test_alias_in () {
 	memset(arg.msg, 0, 512 * sizeof(char));
 	strcpy(arg.msg, "`in 1m say");
 	response = alias_in(&arg);
-	mu_assert("`in failed for 1 time arg", strcmp("Timer set for 1 minute.", response) == 0);
+	mu_assert(
+		"`in failed for 1 time arg"
+		, strcmp("Timer set for 1 minute.", response) == 0);
+	free(response);
 	
 	strcpy(arg.msg, "`in 10d5h1m500s say");
 	response = alias_in(&arg);
-	mu_assert("`in failed for all time args", strcmp("Timer set for 10 days, 5 hours, 9 minutes and 20 seconds.", response) == 0);
-	
+	mu_assert(
+		"`in failed for all time args"
+		, strcmp(
+			"Timer set for 10 days, 5 hours, 9 minutes and 20 seconds."
+			, response) == 0);
+
+	free(response);
 	free(arg.msg);
 	return 0;
 }

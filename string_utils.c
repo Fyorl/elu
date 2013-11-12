@@ -43,15 +43,21 @@ void string_join_english (char** pieces, int len, char* result, int maxlen) {
 	int penultimate = -1;
 	int i;
 
-	for (i = 0; i < len; i++) {
+	for (i = len - 1; i > -1; i--) {
 		if (pieces[i] != NULL) {
-			penultimate = ultimate;
-			ultimate = i;
+			ultimate = penultimate;
+			penultimate = i;
+		}
+
+		if (ultimate > -1) {
+			break;
 		}
 	}
 	
 	char* join_last = NULL;
-	if (penultimate > -1) {
+	char* penultimate_preserve = NULL;
+	char* ultimate_preserve = NULL;
+	if (ultimate > -1) {
 		join_last = calloc(
 			strlen(pieces[penultimate]) + strlen(pieces[ultimate]) + 6
 			, sizeof(char));
@@ -59,6 +65,8 @@ void string_join_english (char** pieces, int len, char* result, int maxlen) {
 		strcat(join_last, " and ");
 		strcat(join_last, pieces[ultimate]);
 		
+		penultimate_preserve = pieces[penultimate];
+		ultimate_preserve = pieces[ultimate];
 		pieces[penultimate] = join_last;
 		pieces[ultimate] = NULL;
 	}
@@ -67,6 +75,11 @@ void string_join_english (char** pieces, int len, char* result, int maxlen) {
 	
 	if (join_last != NULL) {
 		free(join_last);
+	}
+
+	if (ultimate > -1) {
+		pieces[penultimate] = penultimate_preserve;
+		pieces[ultimate] = ultimate_preserve;
 	}
 }
 

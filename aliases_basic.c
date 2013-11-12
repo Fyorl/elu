@@ -14,75 +14,39 @@
 extern int sock;
 extern sqlite3* db;
 
+char* write_time_string (int time_item, const char* time_item_name) {
+	char* str = NULL;
+	int len;
+
+	if (time_item > 0) {
+		str = malloc(64);
+		snprintf(str, 62, "%d %s", time_item, time_item_name);
+		
+		if (time_item > 1) {
+			len = strlen(str);
+			str[len] = 's';
+			str[len + 1] = '\0';
+		}
+	}
+
+	return str;
+}
 
 char* timer_response (int days, int hours, int minutes, int seconds) {
 	char join[640];
 	char** pieces = calloc(4, sizeof(char*));
 	int len;
 	
-	char* days_str = NULL;
-	char* hours_str = NULL;
-	char* minutes_str = NULL;
-	char* seconds_str = NULL;
-	
-	if (days > 0) {
-		days_str = malloc(64);
-		snprintf(days_str, 62, "%d day", days);
-		
-		if (days > 1) {
-			len = strlen(days_str);
-			days_str[len] = 's';
-			days_str[len + 1] = '\0';
-		}
-	}
-	
-	if (hours > 0) {
-		hours_str = malloc(64);
-		snprintf(hours_str, 62, "%d hour", hours);
-		
-		if (hours > 1) {
-			len = strlen(hours_str);
-			hours_str[len] = 's';
-			hours_str[len + 1] = '\0';
-		}
-	}
-	
-	if (minutes > 0) {
-		minutes_str = malloc(64);
-		snprintf(minutes_str, 62, "%d minute", minutes);
-		
-		if (minutes > 1) {
-			len = strlen(minutes_str);
-			minutes_str[len] = 's';
-			minutes_str[len + 1] = '\0';
-			printf("%s\n", minutes_str);
-		}
-	}
-	
-	if (seconds > 0) {
-		seconds_str = malloc(64);
-		snprintf(seconds_str, 62, "%d second", seconds);
-		
-		if (seconds > 1) {
-			len = strlen(seconds_str);
-			seconds_str[len] = 's';
-			seconds_str[len + 1] = '\0';
-		}
-	}
-	
-	pieces[0] = days_str;
-	pieces[1] = hours_str;
-	pieces[2] = minutes_str;
-	printf("pieces[2] = %s\n", pieces[2]);
-	pieces[3] = seconds_str;
+	pieces[0] = write_time_string(days, "day");
+	pieces[1] = write_time_string(hours, "hour");
+	pieces[2] = write_time_string(minutes, "minute");
+	pieces[3] = write_time_string(seconds, "second");
 	
 	string_join_english(pieces, 4, join, 638);
 	
 	int i;
 	for (i = 0; i < 4; i++) {
 		if (pieces[i] != NULL) {
-			printf("Freeing index %d\n", i);
-			printf("%s\n", pieces[i]);
 			free(pieces[i]);
 		}
 	}
@@ -95,7 +59,6 @@ char* timer_response (int days, int hours, int minutes, int seconds) {
 	char* response_return = calloc(strlen(join) + 15, sizeof(char));
 	strcpy(response_return, "Timer set for ");
 	strcat(response_return, join);
-	printf("\n\n");
 	
 	return response_return;
 }
@@ -139,6 +102,22 @@ char* alias_reply (const alias_arg* params) {
 	return NULL;
 }
 
+const char* parse_timer_string (
+		const char* timer_string
+		, const char* time_char
+		, int space_pos
+		, int* result) {
+
+	char* unparsed;
+	int pos = strpos(timer_string, time_char);
+	if (pos > 0 && pos < space_pos) {
+		*result = (int) strtol(timer_string, &unparsed, 10);
+		timer_string = unparsed + 1;
+	}
+
+	return timer_string;
+}
+
 char* alias_in (const alias_arg* params) {
 	const char* time_to_add = string_chomp(params->msg, " ");
 	const char* cmd = string_chomp(time_to_add, " ");
@@ -148,37 +127,15 @@ char* alias_in (const alias_arg* params) {
 	}
 	
 	int space = strpos(time_to_add, " ");
-	int pos;
-	char* tmp;
-	
 	int days = 0;
 	int hours = 0;
 	int minutes = 0;
 	int seconds = 0;
-	
-	pos = strpos(time_to_add, "d");
-	if (pos > 0 && pos < space) {
-		days = (int) strtol(time_to_add, &tmp, 10);
-		time_to_add = tmp + 1;
-	}
-	
-	pos = strpos(time_to_add, "h");
-	if (pos > 0 && pos < space) {
-		hours = (int) strtol(time_to_add, &tmp, 10);
-		time_to_add = tmp + 1;
-	}
-	
-	pos = strpos(time_to_add, "m");
-	if (pos > 0 && pos < space) {
-		minutes = (int) strtol(time_to_add, &tmp, 10);
-		time_to_add = tmp + 1;
-	}
-	
-	pos = strpos(time_to_add, "s");
-	if (pos > 0 && pos < space) {
-		seconds = (int) strtol(time_to_add, &tmp, 10);
-		time_to_add = tmp + 1;
-	}
+
+	time_to_add = parse_timer_string(time_to_add, "d", space, &days);
+	time_to_add = parse_timer_string(time_to_add, "h", space, &hours);
+	time_to_add = parse_timer_string(time_to_add, "m", space, &minutes);
+	time_to_add = parse_timer_string(time_to_add, "s", space, &seconds);
 	
 	// Time maths.
 	int quotient;
@@ -193,7 +150,7 @@ char* alias_in (const alias_arg* params) {
 	
 	quotient = hours / 24;
 	days += quotient;
-	hours -= hours * 24;
+	hours -= quotient * 24;
 	
 	if (days > 0 || hours > 0 || minutes > 0 || seconds > 0) {
 		return timer_response(days, hours, minutes, seconds);
