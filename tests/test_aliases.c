@@ -5,6 +5,8 @@
 
 static char* test_alias_in () {
 	alias_arg arg;
+	arg.nick = "TestNick";
+	arg.channel = "#elu";
 	arg.msg = calloc(512, sizeof(char));
 	strcpy(arg.msg, "`in");
 	

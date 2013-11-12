@@ -1,5 +1,6 @@
 #include <pthread.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,6 +10,8 @@
 #include "elu.h"
 #include "irc.h"
 #include "string_utils.h"
+#include "timers.h"
+#include "timestamp.h"
 #include "vendor/sqlite3.h"
 
 extern int sock;
@@ -153,6 +156,14 @@ char* alias_in (const alias_arg* params) {
 	hours -= quotient * 24;
 	
 	if (days > 0 || hours > 0 || minutes > 0 || seconds > 0) {
+		int64_t ms = timestamp()
+			+ (days * 24 * 60 * 60
+			+ hours * 60 * 60
+			+ minutes * 60
+			+ seconds)
+			* 1000;
+
+		timer_add(params->nick, params->channel, ms, cmd);
 		return timer_response(days, hours, minutes, seconds);
 	}
 	
